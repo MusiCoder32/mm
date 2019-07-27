@@ -93,9 +93,6 @@ page {
   height: 100rpx;
   margin-top: var(--status-bar-height);
 }
-.place-bottom {
-  height: 300rpx;
-}
 .user {
   width: 92%;
   padding: 0 4%;

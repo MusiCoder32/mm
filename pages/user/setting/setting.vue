@@ -2,115 +2,76 @@
 	<view>
 		<view class="content">
 			<view class="list">
-				<view class="row">
-					<view class="title">头像</view>
-					<view class="right">
-						<view class="tis">
-							<image src="/static/img/face.jpg" mode="widthFix"></image>
-						</view>
-						<view class="icon xiangyou"></view>
-					</view>
-				</view>
-				<view class="row">
+				<view class="row" @click="editInfo('nickname')">
 					<view class="title">昵称</view>
 					<view class="right">
-						<view class="tis">大黑哥</view>
+						<view class="tis">{{nickname}}</view>
 						<view class="icon xiangyou"></view>
 					</view>
 				</view>
-				<view class="row">
-					<view class="title">个性签名</view>
+				<view class="row" @click="editInfo('gender')">
+					<view class="title">性别</view>
 					<view class="right">
-						<view class="tis">这人太懒了，什么都不写</view>
-						<view class="icon xiangyou"></view>
-					</view>
-				</view>
-				<view class="row">
-					<view class="title">收货地址</view>
-					<view class="right">
-						<view class="tis"></view>
-						<view class="icon xiangyou"></view>
-					</view>
-				</view>
-				<view class="row">
-					<view class="title">账户安全</view>
-					<view class="right">
-						<view class="tis"></view>
-						<view class="icon xiangyou"></view>
-					</view>
-				</view>
-			</view>
-			<view class="list">
-				<view class="row">
-					<view class="title">通知提醒</view>
-					<view class="right">
-						<view class="tis"></view>
-						<view class="icon xiangyou"></view>
-					</view>
-				</view>
-				<view class="row">
-					<view class="title">支付设置</view>
-					<view class="right">
-						<view class="tis"></view>
-						<view class="icon xiangyou"></view>
-					</view>
-				</view>
-				<view class="row">
-					<view class="title">通用</view>
-					<view class="right">
-						<view class="tis"></view>
-						<view class="icon xiangyou"></view>
-					</view>
-				</view>
-			</view>
-			<view class="list">
-				<view class="row">
-					<view class="title">版本升级</view>
-					<view class="right">
-						<view class="tis">v1.0.0</view>
-						<view class="icon xiangyou"></view>
-					</view>
-				</view>
-				<view class="row">
-					<view class="title">清除缓存</view>
-					<view class="right">
-						<view class="tis"></view>
-						<view class="icon xiangyou"></view>
-					</view>
-				</view>
-				<view class="row">
-					<view class="title">问题反馈</view>
-					<view class="right">
-						<view class="tis"></view>
-						<view class="icon xiangyou"></view>
-					</view>
-				</view>
-				<view class="row">
-					<view class="title">关于商城</view>
-					<view class="right">
-						<view class="tis"></view>
+						<view class="tis">{{gender}}</view>
 						<view class="icon xiangyou"></view>
 					</view>
 				</view>
 			</view>
 		</view>
-		<view class="list-cell log-out-btn" @click="toLogout">
+		<view class="list-cell log-out-btn" @click="logout">
 			<text class="cell-tit">退出登录</text>
 		</view>
 	</view>
 </template>
 
 <script>
+	import {
+		mapMutations
+	} from 'vuex';
+
 	export default {
 		data() {
 			return {
-
+				gender: 0,
+				nickname: "小明"
 			};
 		},
+		onShow() {
+			uni.getStorage({
+				key: 'user_text',
+				success: (res) => {
+					if (res.data.gender == 0) {
+						this.gender = "保密";
+					} else if (res.data.gender == 1) {
+						this.gender = "男";
+					} else if (res.data.gender == 2) {
+						this.gender = "男";
+					} else {
+						this.gender = "保密";
+					}
+					this.nickname = res.data.nickname;
+					console.log(res.data.nickname)
+				},
+				fail: (e) => {
+
+				}
+			});
+
+		},
+		onLoad() {},
 		methods: {
+			...mapMutations(['logout']),
 			showType(tbIndex) {
 				this.tabbarIndex = tbIndex;
 				this.list = this.orderList[tbIndex];
+			},
+			editInfo(item) {
+				uni.navigateTo({
+					url: '/pages/user/setting/setItem/edit_info?item=' + item,
+					success: res => {},
+					fail: () => {},
+					complete: () => {}
+				});
 			}
 		}
 	}
@@ -127,7 +88,6 @@
 	}
 
 	.content {
-		padding-bottom: 20upx;
 
 		.list {
 			width: 96%;
@@ -179,34 +139,40 @@
 			}
 		}
 	}
-	.list-cell{
-		display:flex;
-		align-items:baseline;
-		padding: 20upx $page-row-spacing;
-		line-height:60upx;
-		position:relative;
+
+	.list-cell {
+		display: flex;
+		align-items: baseline;
+		padding: 20upx 30upx;
+		line-height: 60upx;
+		position: relative;
 		background: #fff;
 		justify-content: center;
-		&.log-out-btn{
+
+		&.log-out-btn {
 			margin-top: 40upx;
-			.cell-tit{
+
+			.cell-tit {
 				color: $uni-color-logout;
 				text-align: center;
 				margin-right: 0;
 			}
 		}
-		&.cell-hover{
-			background:#fafafa;
+
+		&.cell-hover {
+			background: #fafafa;
 		}
-		&.b-b:after{
+
+		&.b-b:after {
 			left: 30upx;
 		}
-		&.m-t{
-			margin-top: 16upx; 
+
+		&.m-t {
+			margin-top: 16upx;
 		}
-		switch{
+
+		switch {
 			transform: translateX(16upx) scale(.84);
 		}
 	}
-
 </style>

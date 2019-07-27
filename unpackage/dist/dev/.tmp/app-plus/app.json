@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/tabBar/home/home",
+    "pages/cardAuth/cardAuth",
     "pages/tabBar/cart/cart",
     "pages/tabBar/user/user",
     "pages/goods/goods",
@@ -9,6 +10,7 @@
     "pages/login/resetpasswd",
     "pages/order/confirmation",
     "pages/user/setting/setting",
+    "pages/user/setting/setItem/edit_info",
     "pages/user/myQR/myQR",
     "pages/msg/msg",
     "pages/msg/chat/chat",
@@ -97,5 +99,7 @@
   },
   "appname": "商城模板(含登陆注册)",
   "compilerVersion": "2.1.3",
-  "usingComponents": {}
+  "usingComponents": {
+    "cu-custom": "/colorui/components/cu-custom"
+  }
 }

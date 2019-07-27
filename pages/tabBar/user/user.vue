@@ -17,12 +17,16 @@
 		<view class="user">
 			<!-- 头像 -->
 			<view class="left">
-				<image :src="user.user_text.head_portrait" @tap="toSetting"></image>
+				<image :src="user_text.head_portrait" @tap="toSetting"></image>
 			</view>
 			<!-- 昵称,个性签名 -->
 			<view class="right">
-				<view class="username" @tap="toLogin">{{user.user_text.nickname}}</view>
-				<view class="signature" @tap="toSetting">{{user.signature}}</view>
+				<view class="username" @tap="toLogin">{{user_text.nickname}}</view>
+				<view class="signature" @tap="toSetting" style="margin-top: 20upx;">
+					<navigator style="color: lightsteelblue;" hover-class="navigator-hover" open-type='navigate' url="/pages/cardAuth/cardAuth">
+						去认证>
+						</navigator>
+					</view>
 			</view>
 			<!-- 二维码按钮 -->
 			<view class="erweima" @tap="toMyQR">
@@ -30,7 +34,7 @@
 			</view>
 		</view>
 		<!-- VIP banner -->
-<!-- 		<view class="VIP">
+		<!-- 		<view class="VIP">
 			<view class="img">
 				<image src="/static/img/VIP.png"></image>
 			</view>
@@ -52,15 +56,15 @@
 			<view class="balance-info">
 				<view class="left">
 					<view class="box">
-						<view class="num">{{user.integral}}</view>
+						<view class="num">{{}}</view>
 						<view class="text">积分</view>
 					</view>
 					<view class="box">
-						<view class="num">{{user.envelope}}</view>
+						<view class="num">{{}}</view>
 						<view class="text">佣金</view>
 					</view>
 					<view class="box">
-						<view class="num">{{user.balance}}</view>
+						<view class="num">{{}}</view>
 						<view class="text">余额</view>
 					</view>
 				</view>
@@ -86,8 +90,6 @@
 				</view>
 			</view>
 		</view>
-		<!-- 占位 -->
-		<view class="place-bottom"></view>
 	</view>
 </template>
 <script>
@@ -105,24 +107,22 @@
 				statusTop: null,
 				showHeader: true,
 				//个人信息,
-				user: {
-					"uid": 4106,
-					"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImp0aSI6IjEifQ.eyJpc3MiOiJzb3VsIiwiYXVkIjoic291bCIsImp0aSI6IjEiLCJpYXQiOjE1NjM5NjM5MTIsIm5iZiI6MTU2Mzk2MzkxMiwiZXhwIjoxNTY2NTU1OTEyLCJ1aWQiOjQxMDZ9.4SJvjmrx7GxktfJhVPA2guUp8A2rPsVdsHElHQmbcAw",
-					"user_text": {
-						"nickname": "wyj1",
-						"portrait": "/head_tem.jpg",
-						"county": "",
-						"province": "",
-						"city": "",
-						"gender": 0,
-						"protrait_type": 0
-					},
-					"user_wallet": {
-						"account_balance": 0,
-						"shopping_points": 0,
-						"retail_points": 0,
-						"packets_points": 0
-					}
+				uid: 4106,
+				token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImp0aSI6IjEifQ.eyJpc3MiOiJzb3VsIiwiYXVkIjoic291bCIsImp0aSI6IjEiLCJpYXQiOjE1NjM5NjM5MTIsIm5iZiI6MTU2Mzk2MzkxMiwiZXhwIjoxNTY2NTU1OTEyLCJ1aWQiOjQxMDZ9.4SJvjmrx7GxktfJhVPA2guUp8A2rPsVdsHElHQmbcAw",
+				user_text: {
+					"nickname": "wyj1",
+					"portrait": "/head_tem.jpg",
+					"county": "",
+					"province": "",
+					"city": "",
+					"gender": 0,
+					"protrait_type": 0
+				},
+				user_wallet: {
+					"account_balance": 0,
+					"shopping_points": 0,
+					"retail_points": 0,
+					"packets_points": 0
 				},
 				// user: {
 				// 	username: '游客1002',
@@ -215,26 +215,6 @@
 			this.statusTop = e.scrollTop >= 0 ? null : -this.statusHeight + 'px';
 		},
 		onLoad() {
-			this.currentRoute = getCurrentPages()[0] ? getCurrentPages()[0].route : "pages/tabBar/home/home"
-			uni.getStorage({
-				key: 'userInfo',
-				success: (res) => {
-					console.log(res)
-					this.$api.msg("用户已登陆")
-					if (!res.data) {
-						if (this.isfirst) {
-							//this.toLogin();
-						}
-						return;
-					}
-					this.user = res.data;
-				},
-				fail: (e) => {
-					this.$api.msg("用户未登陆")
-					this.toLogin();
-					// this.hasLogined()
-				}
-			});
 			this.statusHeight = 0;
 			// #ifdef APP-PLUS
 			this.showHeader = false;
@@ -244,7 +224,27 @@
 		onReady() {
 			//此处，演示,每次页面初次渲染都把登录状态重置
 		},
-		onShow() {},
+		onShow() {
+			this.currentRoute = getCurrentPages()[0] ? getCurrentPages()[0].route : "pages/tabBar/home/home"
+			uni.getStorage({
+				key: 'user_text',
+				success: (res) => {
+					if (!res.data) {
+						if (this.isfirst) {
+							//this.toLogin();
+						}
+						return;
+					}
+					this.hasLogined()
+					this.user_text = res.data;
+				},
+				fail: (e) => {
+					this.$api.msg("请先登陆")
+					// this.toLogin();
+					this.hasLogined()
+				}
+			});
+		},
 		methods: {
 			...mapMutations(['hasLogined']),
 			//消息列表
@@ -281,7 +281,7 @@
 			},
 			isLogin() {
 				//实际应用中,用户登录状态应该用token等方法去维持登录状态.
-				const value = uni.getStorageSync('UserInfo');
+				const value = uni.getStorageSync('uid');
 				if (value) {
 					return true;
 				}
@@ -369,11 +369,6 @@
 		margin-top: var(--status-bar-height);
 		/*  #endif  */
 	}
-
-	.place-bottom {
-		height: 300upx;
-	}
-
 	.user {
 		width: 92%;
 		padding: 0 4%;

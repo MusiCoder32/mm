@@ -2,15 +2,20 @@
  * API接口配置文件
  */
 module.exports = {
-	home: {
-		banner: "index/banner", // 首页banner 
-		navlist: "index/navlist", // 首页导航
-		juhusuan: "index/juhuasuanlist", // 首页聚划算推荐
+	user: {
+		updateUserInfo: '/updateUserInfo'
 	},
 	login: {
-		signin: "/api/login", // 登陆 
-		register: "/api/register", // 注册
-		registerCode: "/api/getRegisterCode", // 注册验证码获取
+		signin: "/login", // 登陆 
+		register: "/register", // 注册
+		registerCode: "/getRegisterCode", // 注册验证码获取
+		logout: '/logout', //退出登陆
+		retrievePassword: '/retrievePassword', //退出登陆
+	},
+	cardAuth: {
+		addUserAuthentication: "/addUserAuthentication", //添加实名认证
+		uploadImage: "/uploadImage", //上传身份证图片
+		getUserAuthentication: '/getUserAuthentication' //查看实名认证
 	},
 	common: {
 		couponlist: "index/couponlist", // 公共加载商品
