@@ -24,7 +24,7 @@
 				"onReachBottomDistance": false,
 				"navigationBarBackgroundColor": "#f3f3f3",
 				"navigationBarTitleText": "实名认证",
-				"backgroundColorTop": "#ffffff",
+				"backgroundColorTop": "#f3f3f3",
 				"backgroundColorBottom": "#f3f3f3",
 				"app-plus": {
 					"bounce": "none"

@@ -17,16 +17,16 @@
 		<view class="user">
 			<!-- 头像 -->
 			<view class="left">
-				<image :src="user_text.head_portrait" @tap="toSetting"></image>
+				<image :src="head_portrait" @tap="toSetting"></image>
 			</view>
 			<!-- 昵称,个性签名 -->
 			<view class="right">
-				<view class="username" @tap="toLogin">{{user_text.nickname}}</view>
+				<view class="username">{{user_text.nickname}}</view>
 				<view class="signature" @tap="toSetting" style="margin-top: 20upx;">
 					<navigator style="color: lightsteelblue;" hover-class="navigator-hover" open-type='navigate' url="/pages/cardAuth/cardAuth">
-						去认证>
-						</navigator>
-					</view>
+						{{authResult.state|authTitle}}
+					</navigator>
+				</view>
 			</view>
 			<!-- 二维码按钮 -->
 			<view class="erweima" @tap="toMyQR">
@@ -97,9 +97,12 @@
 		mapState,
 		mapMutations
 	} from 'vuex';
+
+	var _self;
 	export default {
 		data() {
 			return {
+				head_portrait: '/static/img/face.jpg',
 				currentRoute: '',
 				isfirst: true,
 				headerPosition: "fixed",
@@ -124,15 +127,6 @@
 					"retail_points": 0,
 					"packets_points": 0
 				},
-				// user: {
-				// 	username: '游客1002',
-				// 	face: '/static/img/face.jpg',
-				// 	signature: '点击昵称跳转登录/注册页',
-				// 	integral: 0,
-				// 	balance: 0,
-				// 	envelope: 0
-				// },
-				// 订单类型
 				orderList: [{
 						text: '待付款',
 						icon: "fukuan"
@@ -215,6 +209,7 @@
 			this.statusTop = e.scrollTop >= 0 ? null : -this.statusHeight + 'px';
 		},
 		onLoad() {
+			_self = this;
 			this.statusHeight = 0;
 			// #ifdef APP-PLUS
 			this.showHeader = false;
@@ -235,8 +230,27 @@
 						}
 						return;
 					}
-					this.hasLogined()
-					this.user_text = res.data;
+					this.hasLogined();
+					let localPortrait = res.data.head_portrait_local
+					let remotePortrait = res.data.head_portrait
+					// 如果storage中有本地头像路径
+					if (res.data.head_portrait_local) {
+						//通过uni.getSaveFileInfo来判断本地图片是否被删除
+						uni.getSavedFileInfo({
+							filePath: localPortrait, //仅做示例用，非真正的文件路径
+							success: function(res) {
+								console.log(res);
+								//本地图片信息获取成功，使用本地图片展示头像
+								_self.head_portrait = localPortrait;
+							},
+							fail: (e) => {
+								//本地图片信息获取失败，请请求远程头像资源
+								_self.getUserPortrait(remotePortrait)
+							}
+						});
+					} else {
+						this.getUserPortrait(remotePortrait)
+					}
 				},
 				fail: (e) => {
 					this.$api.msg("请先登陆")
@@ -244,9 +258,52 @@
 					this.hasLogined()
 				}
 			});
+			this.$Request.post(this.$Urlconf.cardAuth.getUserAuthentication).then((res) => {
+				if (res.code == 0) {
+					uni.setStorage({
+						key: 'authResult',
+						data: res.data
+					})
+					this.updateAuth(res.data)
+				}
+			}).catch((err) => {
+				console.log(err)
+			}).finally(() => {
+
+			})
 		},
 		methods: {
-			...mapMutations(['hasLogined']),
+			...mapMutations(['hasLogined', 'updateAuth']),
+			//重新请求用户关头像
+			getUserPortrait(imgPath) {
+				let user_text = uni.getStorageInfoSync('user_text')
+				//uni.saveFile只能传入临时文件地址，故需先下载远程头像
+				uni.downloadFile({
+					url: imgPath,
+					success: (res) => {
+						if (res.statusCode === 200) {
+							console.log('下载成功');
+							// 使用uni.saveFile保存下载的远程头像
+							uni.saveFile({
+								tempFilePath: res.tempFilePath,
+								success: (res) => {
+									this.head_portrait = res.savedFilePath;
+									user_text.head_portrait_local = res.savedFilePath;
+									uni.setStorage({
+										key: 'user_text',
+										data: user_text
+									})
+								},
+								fail: (err) => {
+									console.log(err)
+								}
+							})
+
+						}
+					}
+				})
+
+			},
 			//消息列表
 			toMsg() {
 				uni.navigateTo({
@@ -306,7 +363,20 @@
 			}
 		},
 		computed: {
-			...mapState(['hasLogin'])
+			...mapState(['hasLogin', 'authResult'])
+		},
+		filters: {
+			authTitle: function(type) {
+				if (type === 0) {
+					return '认证中>'
+				} else if (type === 1) {
+					return '已认证'
+				} else if (type === 2) {
+					return '认证失败>'
+				} else {
+					return '未认证'
+				}
+			}
 		}
 	}
 </script>
@@ -369,6 +439,7 @@
 		margin-top: var(--status-bar-height);
 		/*  #endif  */
 	}
+
 	.user {
 		width: 92%;
 		padding: 0 4%;
@@ -383,7 +454,6 @@
 			height: 20vw;
 			flex-shrink: 0;
 			margin-right: 20upx;
-			border: solid 1upx #fff;
 			border-radius: 100%;
 
 			image {

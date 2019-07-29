@@ -30,6 +30,21 @@ page {
 .icon {
   font-size: 30rpx;
 }
+.left {
+  width: 20vw;
+  height: 20vw;
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
+  margin-right: 20rpx;
+  border: solid 1rpx #fff;
+  border-radius: 100%;
+}
+.left image {
+    width: 20vw;
+    height: 20vw;
+    border-radius: 100%;
+}
 .content .list {
   width: 96%;
   padding-left: 4%;

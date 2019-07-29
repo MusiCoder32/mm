@@ -68,7 +68,6 @@
 
 		},
 		onBackPress(options) {
-			console.log(123)
 			this.onreturn();
 			return true;
 		},
@@ -145,34 +144,34 @@
 			},
 			doLogin() {
 				// 测试用，需删除代码 
-// 				const data = {
-// 					"uid": 4106,
-// 					"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImp0aSI6IjEifQ.eyJpc3MiOiJzb3VsIiwiYXVkIjoic291bCIsImp0aSI6IjEiLCJpYXQiOjE1NjQxMDc2NjcsIm5iZiI6MTU2NDEwNzY2NywiZXhwIjoxNTY2Njk5NjY3LCJ1aWQiOjQxMDZ9.20I3LdJAdo8UmN5U3o_uGLnWCvVBiHQM_4B-V_cwbXw",
-// 					"user_text": {
-// 						"nickname": "wyj1",
-// 						"gender": 0,
-// 						"country": "",
-// 						"province": "",
-// 						"city": "",
-// 						"head_portrait": "http://t249d62588.zicp.vip/head_tem.jpg",
-// 						"portrait_type": 0
-// 					},
-// 					"user_wallet": {
-// 						"account_balance": "0.00",
-// 						"shopping_points": 0,
-// 						"retail_points": 0,
-// 						"packets_points": 0
-// 					}
-// 				}
-// 
-// 				this.login(data)
-// 				uni.reLaunch({
-// 					url: '\/' + this.backroute,
-// 					success: res => {},
-// 					fail: () => {},
-// 					complete: () => {}
-// 				});
-// 				return;
+				// 				const data = {
+				// 					"uid": 4106,
+				// 					"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImp0aSI6IjEifQ.eyJpc3MiOiJzb3VsIiwiYXVkIjoic291bCIsImp0aSI6IjEiLCJpYXQiOjE1NjQxMDc2NjcsIm5iZiI6MTU2NDEwNzY2NywiZXhwIjoxNTY2Njk5NjY3LCJ1aWQiOjQxMDZ9.20I3LdJAdo8UmN5U3o_uGLnWCvVBiHQM_4B-V_cwbXw",
+				// 					"user_text": {
+				// 						"nickname": "wyj1",
+				// 						"gender": 0,
+				// 						"country": "",
+				// 						"province": "",
+				// 						"city": "",
+				// 						"head_portrait": "http://t249d62588.zicp.vip/head_tem.jpg",
+				// 						"portrait_type": 0
+				// 					},
+				// 					"user_wallet": {
+				// 						"account_balance": "0.00",
+				// 						"shopping_points": 0,
+				// 						"retail_points": 0,
+				// 						"packets_points": 0
+				// 					}
+				// 				}
+				// 
+				// 				this.login(data)
+				// 				uni.reLaunch({
+				// 					url: '\/' + this.backroute,
+				// 					success: res => {},
+				// 					fail: () => {},
+				// 					complete: () => {}
+				// 				});
+				// 				return;
 
 
 
@@ -202,7 +201,12 @@
 					console.log(res)
 					if (res.code == 0) {
 						if (res.data.user_text.portrait_type == 0) {
-							res.data.user_text.head_portrait = this.$RootHttp.APIHOST + res.data.user_text.head_portrait
+							//如果有值才保存头像地址，无值则表明使用默认头像
+							if (res.data.user_text.head_portrait) {
+								res.data.user_text.head_portrait = this.$RootHttp.APIHOST + this.$RootHttp.IMGPATH + res.data.user_text.head_portrait
+							} else {
+								res.data.user_text.head_portrait_local = '/static/img/face.jpg'
+							}
 						}
 						this.login(res.data)
 						uni.reLaunch({
@@ -211,6 +215,19 @@
 							fail: () => {},
 							complete: () => {}
 						});
+						//登陆成功页面提前查询用户收货地址，存存入storage
+						this.$Request.post(this.$Urlconf.user.getUserAddress).then((res) => {
+							console.log(res)
+							if (res.code == 0) {
+								uni.setStorage({
+									key: 'addressList',
+									data: res.data
+								})
+							}
+						}).catch((err) => {
+							console.log(err)
+						}).finally(() => {
+						})
 					} else {
 						this.$api.msg(res.msg)
 					}

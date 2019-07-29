@@ -2,17 +2,26 @@
 	<view>
 		<view class="content">
 			<view class="list">
+				<view class="row" @click="editPortrait">
+					<view class="title">头像</view>
+					<view class="right">
+						<view class="left">
+							<image :src="head_portrait" mode=""></image>
+						</view>
+						<view class="icon xiangyou"></view>
+					</view>
+				</view>
 				<view class="row" @click="editInfo('nickname')">
 					<view class="title">昵称</view>
 					<view class="right">
-						<view class="tis">{{nickname}}</view>
+						<view class="tis">{{user_text.nickname}}</view>
 						<view class="icon xiangyou"></view>
 					</view>
 				</view>
 				<view class="row" @click="editInfo('gender')">
 					<view class="title">性别</view>
 					<view class="right">
-						<view class="tis">{{gender}}</view>
+						<view class="tis">{{user_text.gender|genderTitle}}</view>
 						<view class="icon xiangyou"></view>
 					</view>
 				</view>
@@ -26,31 +35,27 @@
 
 <script>
 	import {
+		mapState,
 		mapMutations
 	} from 'vuex';
-
+	var _self;
 	export default {
 		data() {
 			return {
-				gender: 0,
-				nickname: "小明"
+				user_text: {},
+				head_portrait: ''
 			};
 		},
 		onShow() {
 			uni.getStorage({
 				key: 'user_text',
 				success: (res) => {
-					if (res.data.gender == 0) {
-						this.gender = "保密";
-					} else if (res.data.gender == 1) {
-						this.gender = "男";
-					} else if (res.data.gender == 2) {
-						this.gender = "男";
+					this.user_text = res.data;
+					if (res.data.head_portrait_local) {
+						this.head_portrait = res.data.head_portrait_local;
 					} else {
-						this.gender = "保密";
+						this.head_portrait = res.data.head_portrait;
 					}
-					this.nickname = res.data.nickname;
-					console.log(res.data.nickname)
 				},
 				fail: (e) => {
 
@@ -58,12 +63,70 @@
 			});
 
 		},
-		onLoad() {},
+		onLoad() {
+			_self = this;
+		},
 		methods: {
 			...mapMutations(['logout']),
 			showType(tbIndex) {
 				this.tabbarIndex = tbIndex;
 				this.list = this.orderList[tbIndex];
+			},
+			editPortrait() {
+				uni.chooseImage({
+					count: 1,
+					success: function(res) {
+						let upload_head_portrait = res.tempFilePaths[0]
+						//将头像图片重新保存到本地，以防止之前的照片被删除
+						uni.saveFile({
+							tempFilePath: upload_head_portrait,
+							success: function(saveRes) {
+								upload_head_portraitt = saveRes.savedFilePath;
+							},
+							fail: (e) => {
+								console.log(e)
+							}
+						});
+						uni.showLoading()
+						//上传用户选择的头像到服务器
+						uni.uploadFile({
+							url: _self.$RootHttp.APIHOST + _self.$RootHttp.APIPATH + '/uploadUserPortrait',
+							filePath: res.tempFilePaths[0],
+							name: 'file',
+							header: {
+								token: uni.getStorageSync('token')
+							},
+							formData: {
+								file: res.tempFilePaths[0],
+							},
+							success: (result) => {
+								console.log(result)
+								if (JSON.parse(result.data).code == 0) {
+									let user_text = uni.getStorageInfoSync('user_text');
+									//将头像的运程地址保存在storage
+									user_text.head_portrait = _self.$RootHttp.APIHOST + _self.$RootHttp.APIPATH +JSON.parse(result.data).data.filename
+									//将头像的本地地址保存在storage
+									user_text.head_portrait_local = upload_head_portrait
+									uni.setStorage({
+										key: 'user_text',
+										data: user_text
+									})
+									// 用户头像上传成功后，才展示保存的本地头像
+									_self.head_portrait = upload_head_portrait
+								} else {
+									this.$api.msg(JSON.parse(result.data).msg)
+								}
+							},
+							fail: (err) => {
+								console.log(err)
+							},
+							complete: function() {
+								uni.hideLoading()
+							}
+						})
+
+					}
+				})
 			},
 			editInfo(item) {
 				uni.navigateTo({
@@ -73,7 +136,25 @@
 					complete: () => {}
 				});
 			}
+		},
+		computed: {
+			...mapState([''])
+		},
+		filters: {
+			genderTitle: function(type) {
+				if (type == 0) {
+					return "保密";
+				}
+				if (type == 1) {
+					return "男";
+				}
+				if (type == 2) {
+					return "女";
+				}
+				return "保密";
+			}
 		}
+
 	}
 </script>
 
@@ -84,6 +165,22 @@
 
 	.icon {
 		font-size: 30upx;
+
+	}
+
+	.left {
+		width: 20vw;
+		height: 20vw;
+		flex-shrink: 0;
+		margin-right: 20upx;
+		border: solid 1upx #fff;
+		border-radius: 100%;
+
+		image {
+			width: 20vw;
+			height: 20vw;
+			border-radius: 100%;
+		}
 
 	}
 

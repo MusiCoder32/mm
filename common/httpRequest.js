@@ -25,9 +25,9 @@ module.exports = {
 		return info;
 	},
 	post: function(url, data, header) {
-		let token =uni.getStorageSync('token')
+		let token = uni.getStorageSync('token')
 		header = header || "application/x-www-form-urlencoded";
-		url = this.config("APIHOST") + url;
+		url = this.config("APIHOST") + this.config("APIPATH") + url;
 		console.log(url)
 		return new Promise((succ, error) => {
 			uni.request({
@@ -49,7 +49,7 @@ module.exports = {
 	},
 	get: function(url, data, header) {
 		header = header || "application/x-www-form-urlencoded";
-		url = this.config("APIHOST") + url;
+		url = this.config("APIHOST") + this.config("APIPATH") + url;
 		return new Promise((succ, error) => {
 			uni.request({
 				url: url,

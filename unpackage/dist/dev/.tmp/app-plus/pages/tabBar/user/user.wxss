@@ -114,7 +114,6 @@ page {
         -ms-flex-negative: 0;
             flex-shrink: 0;
     margin-right: 20rpx;
-    border: solid 1rpx #fff;
     border-radius: 100%;
 }
 .user .left image {

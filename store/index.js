@@ -5,29 +5,11 @@ import HttpApi from '../common/httpApi.js'
 
 Vue.use(Vuex)
 
-function clearUserInfo() {
-	uni.removeStorage({ //缓存用户登陆状态
-		key: 'user_text',
-	})
-	uni.removeStorage({ //缓存用户登陆状态
-		key: 'token',
-	})
-	uni.removeStorage({ //缓存用户登陆状态
-		key: 'uid',
-	})
-	uni.removeStorage({ //缓存用户登陆状态
-		key: 'user_wallet',
-	})
-	uni.reLaunch({
-		url: '/pages/tabBar/home/home'
-	})
-}
-
-
 const store = new Vuex.Store({
 	state: {
 		hasLogin: false,
 		userInfo: {},
+		authResult: uni.getStorageInfoSync('authRusult'),
 	},
 	mutations: {
 		hasLogined(state) {
@@ -77,11 +59,32 @@ const store = new Vuex.Store({
 			// 				uni.hideLoading();
 			// 			})
 			clearUserInfo()
+		},
+		updateAuth(state, value) {
+			state.authResult = value
 		}
 	},
 	actions: {
 
 	}
 })
+
+function clearUserInfo() {
+	uni.removeStorage({ //缓存用户登陆状态
+		key: 'user_text',
+	})
+	uni.removeStorage({ //缓存用户登陆状态
+		key: 'token',
+	})
+	uni.removeStorage({ //缓存用户登陆状态
+		key: 'uid',
+	})
+	uni.removeStorage({ //缓存用户登陆状态
+		key: 'user_wallet',
+	})
+	uni.reLaunch({
+		url: '/pages/tabBar/home/home'
+	})
+}
 
 export default store

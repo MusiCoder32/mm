@@ -1,6 +1,9 @@
-const ROOTPATH = "http://t249d62588.zicp.vip" + "/api";
+const ROOTPATH = "http://t249d62588.zicp.vip";
+const APIPATH = "/api";
+const IMGPATH  = "/storage"
 
 module.exports = {
 	APIHOST:ROOTPATH,
-	ROOTPATH:ROOTPATH
+	APIPATH:APIPATH,
+	IMGPATH:IMGPATH
 }
