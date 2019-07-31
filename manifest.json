@@ -6,9 +6,9 @@
 	"versionCode": "100",
 	"transformPx": false,
 	"networkTimeout": {
-		"request": 10000,
-		"uploadFile": 20000,
-		"downloadFile": 20000
+		"request": 30000,
+		"uploadFile": 60000,
+		"downloadFile": 60000
 	},
 	"app-plus": {
 		"usingComponents": true, //是否启用`自定义组件模式`，为true表示新的`自定义组件模式` ，否则为`template模板模式`   

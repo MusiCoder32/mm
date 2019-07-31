@@ -1,11 +1,29 @@
 <script>
+	import {
+		mapMutations
+	} from 'vuex'
 	export default {
-		onLaunch: function() {},
+		onLaunch: function() {
+			console.log(2)
+			this.$Request.get(this.$Urlconf.home.goodsTypeAll).then((res) => {
+				console.log(res)
+				if (res.code == 0) {
+					this.getGoodTypeAll(res.data)
+					uni.setStorage({
+						key:'goodTypeAll',
+						data:res.data
+					})
+				}
+			})
+		},
 		onShow: function() {
 			console.log('App Show')
 		},
 		onHide: function() {
 			console.log('App Hide')
+		},
+		methods: {
+			...mapMutations(['getGoodTypeAll'])
 		}
 	}
 </script>

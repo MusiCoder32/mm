@@ -10,8 +10,12 @@ const store = new Vuex.Store({
 		hasLogin: false,
 		userInfo: {},
 		authResult: uni.getStorageSync('authResult'), //authResult.state获取认证状态
+		goodTypeAll: []
 	},
 	mutations: {
+		getGoodTypeAll(state, data) {
+			state.goodTypeAll = data
+		},
 		hasLogined(state) {
 			state.hasLogin = true;
 		},
@@ -36,7 +40,7 @@ const store = new Vuex.Store({
 			})
 		},
 		logout(state) {
-			
+
 			uni.showLoading({
 				mask: true,
 			})
@@ -49,7 +53,7 @@ const store = new Vuex.Store({
 			}
 			uni.hideLoading()
 			uni.reLaunch({
-				url:'/pages/login/login'
+				url: '/pages/login/login'
 			})
 		},
 		updateAuth(state, value) {

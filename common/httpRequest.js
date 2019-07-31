@@ -88,6 +88,7 @@ module.exports = {
 							icon: 'none'
 						})
 					}
+					console.log(result.data);
 					succ.call(self, result.data)
 				},
 				fail: function(e) {

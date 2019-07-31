@@ -7,11 +7,11 @@
 			<!-- 定位城市 -->
 			<view class="addr">
 				<view class="icon location"></view>
-				{{ city }}
+				<!-- {{ city }} -->
 			</view>
 			<!-- 搜索框 -->
 			<view class="input-box">
-				<input placeholder="默认关键字" placeholder-style="color:#c0c0c0;" @tap="toSearch()" />
+				<input v-model="searchData" placeholder="默认关键字" placeholder-style="color:#c0c0c0;" @tap="toSearch()" />
 				<view class="icon search"></view>
 			</view>
 			<!-- 右侧图标按钮 -->
@@ -46,7 +46,7 @@
 		</view>
 		<!-- 广告图 -->
 		<view class="banner">
-			<image src="/static/img/banner.jpg"></image>
+			<image src="/static/img/activing2.png"></image>
 		</view>
 		<!-- 活动区 -->
 		<view class="promotion">
@@ -107,6 +107,7 @@
 	export default {
 		data() {
 			return {
+				searchData:"",
 				rootPath: '',
 				showHeader: true,
 				afterHeaderOpacity: 1, //不透明度
@@ -139,45 +140,45 @@
 					}
 				],
 				// 分类菜单
-				categoryList: [{
-						id: 1,
-						name: '办公',
-						img: '/static/img/category/1.png'
-					},
-					{
-						id: 2,
-						name: '家电',
-						img: '/static/img/category/2.png'
-					},
-					{
-						id: 3,
-						name: '服饰',
-						img: '/static/img/category/3.png'
-					},
-					{
-						id: 4,
-						name: '日用',
-						img: '/static/img/category/4.png'
-					},
-					{
-						id: 5,
-						name: '蔬果',
-						img: '/static/img/category/5.png'
-					},
-					{
-						id: 6,
-						name: '运动',
-						img: '/static/img/category/6.png'
-					},
+				categoryList: [
 					{
 						id: 7,
-						name: '书籍',
+						name: '蔬菜',
 						img: '/static/img/category/7.png'
 					},
 					{
 						id: 8,
-						name: '文具',
+						name: '水果',
 						img: '/static/img/category/8.png'
+					}, {
+						id: 1,
+						name: '水产',
+						img: '/static/img/category/1.png'
+					},
+					{
+						id: 2,
+						name: '肉禽',
+						img: '/static/img/category/2.png'
+					},
+					{
+						id: 3,
+						name: '酒饮',
+						img: '/static/img/category/3.png'
+					},
+					{
+						id: 4,
+						name: '米油面',
+						img: '/static/img/category/4.png'
+					},
+					{
+						id: 5,
+						name: '积分',
+						img: '/static/img/category/5.png'
+					},
+					{
+						id: 6,
+						name: '礼品',
+						img: '/static/img/category/6.png'
 					}
 				],
 				Promotion: [],
@@ -293,6 +294,10 @@
 			}
 		},
 		onLoad() {
+			// this.$Request.get(this.$Urlconf.home.goodsTypeList).then((res) => {
+			// 	console.log(res);
+			// })
+			// 该地址用于获取图片资源
 			this.rootPath = this.$RootHttp.APIHOST + this.$RootHttp.IMGPATH
 			this.$Request.get(this.$Urlconf.home.getAdList).then((res) => {
 				console.log(res)
@@ -434,9 +439,7 @@
 			},
 			//搜索跳转
 			toSearch() {
-				uni.showToast({
-					title: '建议跳转到新页面做搜索功能'
-				});
+				this.toCategory({name:'搜索结果'});
 			},
 			//轮播图跳转
 			toSwiper(e) {

@@ -2,14 +2,14 @@
 	<div class="content" :style="{height:statusBarHeight+44+'wx'}">
 		<div class="status-bar" :style="{height:statusBarHeight+'wx'}"></div>
 		<div class="nav">
-			<text class="icon location">{{ iconLocation }}</text>
-			<text class="location-city-text">{{ city }}</text>
+			<text class="icon location"></text>
+			<!-- <text class="location-city-text">{{ city }}</text> -->
 			<div class="input-box">
-				<input class="input-box-input" placeholder="商品搜索" @focus="inputfocus" />
-				<text class="icon search">{{ iconSearch }}</text>
+				<input class="input-box-input" placeholder="搜索商品" v-model="searchData" />
 			</div>
 			<!-- <text class="icon yuyin">{{ iconYuyin }}</text> -->
-			<text @click="toMsg" class="icon tongzhi">{{ iconTongzhi }}</text>
+<!-- 			<text @click="toMsg" class="icon tongzhi">{{ iconTongzhi }}</text> -->
+				<text @click="inputfocus" class="icon search">{{ iconSearch }}</text>
 		</div>
 	</div>
 </template>
@@ -17,6 +17,7 @@
 export default {
 	data() {
 		return {
+			searchData:'',
 			city: '成都',
 			subNVue: uni.getCurrentSubNVue(),
 			iconSearch: '\ue628',
@@ -64,6 +65,9 @@ export default {
 			this.city = city;
 		},
 		inputfocus() {
+			console.log(456)
+			uni.setStorageSync("key_word",this.searchData)
+			this.searchData = '',
 			this.subNVue.postMessage({
 				type: 'focus'
 			});
@@ -119,7 +123,7 @@ export default {
 	color: #000;
 }
 .input-box {
-	width: 465px;
+	width: 575px;
 	margin-left: 5px;
 	height: 60upx;
 	border-radius: 60px;
@@ -130,16 +134,19 @@ export default {
 	align-items: center;
 }
 .input-box-input {
-	width: 330px;
+	width: 510px;
 	height: 60px;
 	font-size: 28px;
 	margin-left: 30px;
 	placeholder-color: #c0c0c0;
 }
+.input-search{
+	margin-left: 20px;
+}
 .search {
+	margin-left: 30px;
 	width: 60px;
-	font-size: 34px;
-	padding-right: 30px;
+	font-size: 48px;
 	color: #c0c0c0;
 }
 </style>
