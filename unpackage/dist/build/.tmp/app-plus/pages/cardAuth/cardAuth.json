@@ -1,0 +1,10 @@
+{
+  "enablePullDownRefresh": false,
+  "onReachBottomDistance": false,
+  "navigationBarBackgroundColor": "#f3f3f3",
+  "navigationBarTitleText": "实名认证",
+  "backgroundColorTop": "#f3f3f3",
+  "backgroundColorBottom": "#f3f3f3",
+  "bounce": "none",
+  "usingComponents": {}
+}

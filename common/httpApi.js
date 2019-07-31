@@ -2,13 +2,21 @@
  * API接口配置文件
  */
 module.exports = {
+	home: {
+		getAdList: '/getAdList', //修改用户基本信息
+		getUserAddress: '/getUserAddress', //查询用户地址
+		addUserAddress: '/addUserAddress', //增加用户地址
+		defaultUserAddress: '/defaultUserAddress', //设为默认地址
+		updateUserAddress: '/updateUserAddress', //修改地址
+		delUserAddress: '/delUserAddress', //修改地址
+	},
 	user: {
-		updateUserInfo: '/updateUserInfo',//修改用户基本信息
-		getUserAddress:'/getUserAddress',//查询用户地址
-		addUserAddress:'/addUserAddress',//增加用户地址
-		defaultUserAddress:'/defaultUserAddress',//设为默认地址
-		updateUserAddress:'/updateUserAddress',//修改地址
-		
+		updateUserInfo: '/updateUserInfo', //修改用户基本信息
+		getUserAddress: '/getUserAddress', //查询用户地址
+		addUserAddress: '/addUserAddress', //增加用户地址
+		defaultUserAddress: '/defaultUserAddress', //设为默认地址
+		updateUserAddress: '/updateUserAddress', //修改地址
+		delUserAddress: '/delUserAddress', //修改地址
 	},
 	login: {
 		signin: "/login", // 登陆 

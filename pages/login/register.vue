@@ -80,22 +80,11 @@
 					if (res.code == 999) {
 						this.getCodeisDisable = false;
 						this.getCodeBtnColor = "rgba(255,255,255)"
-						this.$api.msg(res.msg, 3000)
 					}
 				}).catch((err) => {
 					this.getCodeisDisable = false;
 					this.getCodeBtnColor = "rgba(255,255,255)"
-					this.$api.msg(this.$i18n.system_exception, 3000)
-				}).finally(() => {
-					
 				})
-				//示例用定时器模拟请求效果
-				// setTimeout(()=>{
-				// 	uni.showToast({title: '验证码已发送',icon:"none"});
-				// 	//示例默认1234，生产中请删除这一句。
-				// 	this.code=1234;
-				// 	this.setTimer();
-				// },1000)
 			},
 			setTimer() {
 				let holdTime = 60;
@@ -173,9 +162,7 @@
 							url: '\/' + this.backroute
 						});
 					}
-					this.$api.msg(res.msg);
 				}).catch((err) => {
-					console.log(err)
 				}).finally(() => {
 					uni.hideLoading();
 				})

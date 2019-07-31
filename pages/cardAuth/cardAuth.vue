@@ -146,9 +146,6 @@
 				this.uploadCards()
 			},
 			uploadCards: function() {
-				uni.showLoading({
-					title: "资料提交中"
-				});
 				// 提交认证
 				const addUserAuthenticationData = {
 					real_name: this.cardName,
@@ -162,12 +159,6 @@
 							delta: 1
 						});
 					}
-					this.$api.msg(res.msg)
-				}).catch((err) => {
-					console.log(err)
-					this.$api.msg(this.$i18n.system_exception)
-				}).finally(() => {
-					uni.hideLoading();
 				})
 			}
 		},

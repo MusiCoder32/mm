@@ -5,14 +5,14 @@
 				<view class="row" v-for="(row,index) in addressList" :key="index" @tap="select(row)">
 					<view class="left">
 						<view class="head">
-							{{row.head}}
+							{{row.contact_man|nameHead}}
 						</view>
 					</view>
 					<view class="center">
 						<view class="name-tel">
 							<view class="name">{{row.contact_man}}</view>
 							<view class="tel">{{row.mobile}}</view>
-							<view class="default" v-if="row.isDefault==1">
+							<view class="default" v-if="row.is_default==1">
 								默认
 							</view>
 						</view>
@@ -40,21 +40,28 @@
 		data() {
 			return {
 				isSelect: false,
+				editType:'add',
 				addressList: [{
-						id: 1,
-						contact_man: "大黑哥",
-						head: "大",
-						mobile: "18816881688",
-						province:"四川省",
-						city:'成都市',
-						area:'龙泉驿区',
-						address: '北泉路1188号',
-						isDefault: 1
-					}				]
+					id: 1,
+					contact_man: "",
+					head: "",
+					mobile: "",
+					province: "",
+					city: '',
+					area: '',
+					address: '',
+					is_default: 0
+				}]
 			};
 		},
 		onShow() {
-
+			uni.getStorage({
+				key: 'addressList',
+				success: (e) => {
+					this.addressList = e.data;
+				}
+			})
+			//匹配删除的地址，将其删除
 			uni.getStorage({
 				key: 'delAddress',
 				success: (e) => {
@@ -66,6 +73,10 @@
 								break;
 							}
 						}
+						uni.setStorage({
+							key: 'addressList',
+							data: this.addressList
+						})
 					}
 					uni.removeStorage({
 						key: 'delAddress'
@@ -76,18 +87,25 @@
 				key: 'saveAddress',
 				success: (e) => {
 					let len = this.addressList.length;
-					if (e.data.hasOwnProperty('id')) {
+					//edit，则表明为修改
+					if (this.editType == 'edit') {
 						for (let i = 0; i < len; i++) {
 							if (this.addressList[i].id == e.data.id) {
 								this.addressList.splice(i, 1, e.data);
+								uni.setStorage({
+									key: 'addressList',
+									data: this.addressList
+								})
 								break;
 							}
 						}
 					} else {
-						let lastid = this.addressList[len - 1];
-						lastid++;
-						e.data.id = lastid;
+						//add表明新增
 						this.addressList.push(e.data);
+						uni.setStorage({
+							key: 'addressList',
+							data: this.addressList
+						})
 					}
 					uni.removeStorage({
 						key: 'saveAddress'
@@ -102,6 +120,7 @@
 		},
 		methods: {
 			edit(row) {
+				this.editType = 'edit'
 				uni.setStorage({
 					key: 'address',
 					data: row,
@@ -114,6 +133,7 @@
 
 			},
 			add() {
+				this.editType = 'add'
 				uni.navigateTo({
 					url: "edit/edit?type=add"
 				})
@@ -130,6 +150,11 @@
 						uni.navigateBack();
 					}
 				})
+			}
+		},
+		filters: {
+			nameHead: (data) => {
+				return data.trim()[0]
 			}
 		}
 	}

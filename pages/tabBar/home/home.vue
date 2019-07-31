@@ -16,7 +16,7 @@
 			</view>
 			<!-- 右侧图标按钮 -->
 			<view class="icon-btn">
-				<view class="icon yuyin-home"></view>
+				<!-- <view class="icon yuyin-home"></view> -->
 				<view class="icon tongzhi" @tap="toMsg"></view>
 			</view>
 		</view>
@@ -26,8 +26,8 @@
 		<view class="swiper">
 			<view class="swiper-box">
 				<swiper circular="true" autoplay="true" @change="swiperChange">
-					<swiper-item v-for="swiper in swiperList" :key="swiper.id">
-						<image :src="swiper.img" @tap="toSwiper(swiper)"></image>
+					<swiper-item v-for="swiper in swiperList" :key="swiper.aid">
+						<image :src="rootPath+swiper.image_url" @tap="toSwiper(swiper)"></image>
 					</swiper-item>
 				</swiper>
 				<view class="indicator">
@@ -107,29 +107,35 @@
 	export default {
 		data() {
 			return {
+				rootPath: '',
 				showHeader: true,
 				afterHeaderOpacity: 1, //不透明度
 				headerPosition: 'fixed',
 				headerTop: null,
 				statusTop: null,
 				nVueTitle: null,
-				city: '北京',
+				city: '成都',
 				currentSwiper: 0,
 				// 轮播图片
 				swiperList: [{
-						id: 1,
+						aid: 1,
 						src: 'url1',
-						img: '/static/img/1.jpg'
+						image_url: '/static/img/1.jpg'
 					},
 					{
-						id: 2,
+						aid: 2,
 						src: 'url2',
-						img: '/static/img/2.jpg'
+						image_url: '/static/img/2.jpg'
 					},
 					{
-						id: 3,
+						aid: 3,
 						src: 'url3',
-						img: '/static/img/3.jpg'
+						image_url: '/static/img/3.jpg'
+					},
+					{
+						aid: 4,
+						src: 'url3',
+						image_url: '/static/img/3.jpg'
 					}
 				],
 				// 分类菜单
@@ -287,6 +293,13 @@
 			}
 		},
 		onLoad() {
+			this.rootPath = this.$RootHttp.APIHOST + this.$RootHttp.IMGPATH
+			this.$Request.get(this.$Urlconf.home.getAdList).then((res) => {
+				console.log(res)
+				if (res.code == 0) {
+					this.swiperList = res.data
+				}
+			})
 			// #ifdef APP-PLUS
 			this.nVueTitle = uni.getSubNVueById('homeTitleNvue');
 			this.nVueTitle.onMessage(res => {
@@ -636,7 +649,7 @@
 					transition: all 0.3s ease-out;
 
 					&.on {
-						width: (100%/3);
+						width: (100%/4);
 					}
 				}
 			}

@@ -5,10 +5,10 @@
 			<text class="icon location">{{ iconLocation }}</text>
 			<text class="location-city-text">{{ city }}</text>
 			<div class="input-box">
-				<input class="input-box-input" placeholder="默认关键字" @focus="inputfocus" />
+				<input class="input-box-input" placeholder="商品搜索" @focus="inputfocus" />
 				<text class="icon search">{{ iconSearch }}</text>
 			</div>
-			<text class="icon yuyin">{{ iconYuyin }}</text>
+			<!-- <text class="icon yuyin">{{ iconYuyin }}</text> -->
 			<text @click="toMsg" class="icon tongzhi">{{ iconTongzhi }}</text>
 		</div>
 	</div>
@@ -17,7 +17,7 @@
 export default {
 	data() {
 		return {
-			city: '北京',
+			city: '成都',
 			subNVue: uni.getCurrentSubNVue(),
 			iconSearch: '\ue628',
 			iconLocation: '\ue611',

@@ -190,26 +190,23 @@
 					this.$api.msg(this.$i18n.passwdError)
 					return false;
 				}
-				uni.showLoading({
-					title: '登录中...'
-				})
 				const signData = {
 					mobile: this.phoneNumber,
 					password: this.passwd
 				}
 				this.$Request.post(this.$Urlconf.login.signin, signData).then((res) => {
-					console.log(res)
 					if (res.code == 0) {
-						if (res.data.user_text.portrait_type == 0) {
-							//如果有值才保存头像地址，无值则表明使用默认头像
-							if (res.data.user_text.head_portrait) {
-								res.data.user_text.head_portrait = this.$RootHttp.APIHOST + this.$RootHttp.IMGPATH + res.data.user_text.head_portrait
-							} else {
-								res.data.user_text.head_portrait_local = '/static/img/face.jpg'
+						//如果传回的用户信息里有才对头像地址进行判断处理
+						if (res.data.user_text.head_portrait) {
+							if (res.data.user_text.portrait_type == 0) {
+								res.data.user_text.head_portrait = this.$RootHttp.APIHOST + this.$RootHttp.IMGPATH +
+									res.data.user_text.head_portrait
 							}
 						}
 						this.login(res.data)
+						this.backroute = this.backroute || this.$RootHttp.DEFAULTPAGE
 						uni.reLaunch({
+							//this.backroute存放上一个面页路径，通过该路径返回到之前界面
 							url: '\/' + this.backroute,
 							success: res => {},
 							fail: () => {},
@@ -224,21 +221,8 @@
 									data: res.data
 								})
 							}
-						}).catch((err) => {
-							console.log(err)
-						}).finally(() => {
 						})
-					} else {
-						this.$api.msg(res.msg)
 					}
-				}).catch((err) => {
-					console.log(err)
-					uni.showToast({
-						title: '账号或密码不正确',
-						icon: "none"
-					});
-				}).finally(() => {
-					uni.hideLoading()
 				})
 			}
 		}

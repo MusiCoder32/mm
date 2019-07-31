@@ -1,5 +1,5 @@
 <template>
-	<view v-if="hasLogin">
+	<view v-show="hasLogin">
 		<view v-if="showHeader" class="status" :style="{position:headerPosition,top:statusTop}"></view>
 		<view v-if="showHeader" class="header" :style="{position:headerPosition,top:headerTop}">
 			<view class="addr"></view>
@@ -29,9 +29,9 @@
 				</view>
 			</view>
 			<!-- 二维码按钮 -->
-			<view class="erweima" @tap="toMyQR">
+<!-- 			<view class="erweima" @tap="toMyQR">
 				<view class="icon qr"></view>
-			</view>
+			</view> -->
 		</view>
 		<!-- VIP banner -->
 		<!-- 		<view class="VIP">
@@ -102,7 +102,7 @@
 	export default {
 		data() {
 			return {
-				head_portrait: '/static/img/face.jpg',
+				head_portrait: '',
 				currentRoute: '',
 				isfirst: true,
 				headerPosition: "fixed",
@@ -224,59 +224,61 @@
 			uni.getStorage({
 				key: 'user_text',
 				success: (res) => {
-					if (!res.data) {
-						if (this.isfirst) {
-							//this.toLogin();
-						}
-						return;
-					}
-					this.hasLogined();
 					let localPortrait = res.data.head_portrait_local
 					let remotePortrait = res.data.head_portrait
-					// 如果storage中有本地头像路径
-					if (res.data.head_portrait_local) {
-						//通过uni.getSaveFileInfo来判断本地图片是否被删除
-						uni.getSavedFileInfo({
-							filePath: localPortrait, //仅做示例用，非真正的文件路径
-							success: function(res) {
-								console.log(res);
-								//本地图片信息获取成功，使用本地图片展示头像
-								_self.head_portrait = localPortrait;
-							},
-							fail: (e) => {
-								//本地图片信息获取失败，请请求远程头像资源
-								_self.getUserPortrait(remotePortrait)
-							}
-						});
+					// 如果用户信息中有头像信息，表明用户修改过头像，才执行if中判断是否有本地头像的操作
+					//否则直接使用默认头像
+					if (remotePortrait) {
+						// 如果storage中有本地头像路径
+						if (localPortrait) {
+							//通过uni.getSaveFileInfo来判断本地图片是否被删除
+							uni.getSavedFileInfo({
+								filePath: localPortrait, //仅做示例用，非真正的文件路径
+								success: function(res) {
+									console.log(res);
+									//本地图片信息获取成功，使用本地图片展示头像
+									_self.head_portrait = localPortrait;
+								},
+								fail: (e) => {
+									//如何本地图片获取失败先放置默认头像
+									_self.head_portrait = '/static/img/face.jpg';
+									//本地图片信息获取失败，请请求远程头像资源
+									_self.getUserPortrait(remotePortrait)
+								}
+							});
+						} else {
+							_self.getUserPortrait(remotePortrait)
+						}
 					} else {
-						this.getUserPortrait(remotePortrait)
+						_self.head_portrait = '/static/img/face.jpg';
 					}
+					this.hasLogined()
 				},
 				fail: (e) => {
-					this.$api.msg("请先登陆")
-					// this.toLogin();
-					this.hasLogined()
+					_self.$api.msg("请先登陆")
+					_self.toLogin();
+					// this.hasLogined()
 				}
 			});
-			this.$Request.post(this.$Urlconf.cardAuth.getUserAuthentication).then((res) => {
-				if (res.code == 0) {
-					uni.setStorage({
-						key: 'authResult',
-						data: res.data
-					})
-					this.updateAuth(res.data)
-				}
-			}).catch((err) => {
-				console.log(err)
-			}).finally(() => {
-
-			})
+			if (this.authResult.state === 0) {
+				this.$Request.post(this.$Urlconf.cardAuth.getUserAuthentication).then((res) => {
+					if (res.code == 0) {
+						uni.setStorage({
+							key: 'authResult',
+							data: res.data
+						})
+						//此处不知为何，this为undifined
+						_self.updateAuth(res.data)
+					}
+				})
+			}
 		},
 		methods: {
 			...mapMutations(['hasLogined', 'updateAuth']),
 			//重新请求用户关头像
 			getUserPortrait(imgPath) {
-				let user_text = uni.getStorageInfoSync('user_text')
+				uni.showLoading()
+				let user_text = uni.getStorageSync('user_text')
 				//uni.saveFile只能传入临时文件地址，故需先下载远程头像
 				uni.downloadFile({
 					url: imgPath,
@@ -300,6 +302,9 @@
 							})
 
 						}
+					},
+					complete: () => {
+						uni.hideLoading()
 					}
 				})
 
@@ -374,7 +379,7 @@
 				} else if (type === 2) {
 					return '认证失败>'
 				} else {
-					return '未认证'
+					return '未认证>'
 				}
 			}
 		}

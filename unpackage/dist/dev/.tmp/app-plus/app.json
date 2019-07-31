@@ -63,6 +63,11 @@
       }
     ]
   },
+  "networkTimeout": {
+    "request": 10000,
+    "uploadFile": 20000,
+    "downloadFile": 20000
+  },
   "nvue": {
     "pages": {
       "pages/user/order_list/order_list.html": {

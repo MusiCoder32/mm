@@ -81,7 +81,7 @@
 						uni.saveFile({
 							tempFilePath: upload_head_portrait,
 							success: function(saveRes) {
-								upload_head_portraitt = saveRes.savedFilePath;
+								upload_head_portrait = saveRes.savedFilePath;
 							},
 							fail: (e) => {
 								console.log(e)
@@ -100,12 +100,26 @@
 								file: res.tempFilePaths[0],
 							},
 							success: (result) => {
-								console.log(result)
 								if (JSON.parse(result.data).code == 0) {
-									let user_text = uni.getStorageInfoSync('user_text');
+									let user_text = uni.getStorageSync('user_text');
 									//将头像的运程地址保存在storage
-									user_text.head_portrait = _self.$RootHttp.APIHOST + _self.$RootHttp.APIPATH +JSON.parse(result.data).data.filename
+									user_text.head_portrait = _self.$RootHttp.APIHOST + _self.$RootHttp.APIPATH + JSON.parse(result.data).data
+										.filename
 									//将头像的本地地址保存在storage
+									if (user_text.head_portrait_local) {
+										uni.getFileInfo({
+											filePath: user_text.head_portrait_local,
+											success: (res) => {
+												console.log(res)
+											}
+										})
+										uni.removeSavedFile({
+											filePath: user_text.head_portrait_local,
+											complete: function(res) {
+												console.log(res);
+											}
+										});
+									}
 									user_text.head_portrait_local = upload_head_portrait
 									uni.setStorage({
 										key: 'user_text',

@@ -6,7 +6,7 @@
 					收件人
 				</view>
 				<view class="input">
-					<input placeholder="请输入收件人姓名" type="text" v-model="name" />
+					<input placeholder="请输入收件人姓名" type="text" v-model="contact_man" />
 				</view>
 			</view>
 			<view class="row">
@@ -14,7 +14,7 @@
 					电话号码
 				</view>
 				<view class="input">
-					<input placeholder="请输入收件人电话号码" type="text" v-model="tel" />
+					<input placeholder="请输入收件人电话号码" type="text" v-model="mobile" />
 				</view>
 			</view>
 			<view class="row">
@@ -24,14 +24,14 @@
 				<view class="input" @tap="chooseCity">
 					{{region.label}}
 				</view>
-				
+
 			</view>
 			<view class="row">
 				<view class="nominal">
 					详细地址
 				</view>
 				<view class="input">
-					<textarea v-model="detailed" auto-height="true" placeholder="输入详细地址"></textarea>
+					<textarea v-model="address" auto-height="true" placeholder="输入详细地址"></textarea>
 				</view>
 			</view>
 			<view class="row">
@@ -39,7 +39,7 @@
 					设置默认地址
 				</view>
 				<view class="input switch">
-					<switch color="#f06c7a" :checked="isDefault" @change=isDefaultChange />
+					<switch color="#f06c7a" :checked="is_default" @change=isDefaultChange />
 				</view>
 			</view>
 			<view class="row" v-if="editType=='edit'" @tap="del">
@@ -53,7 +53,8 @@
 				保存地址
 			</view>
 		</view>
-		<mpvue-city-picker :themeColor="themeColor" ref="mpvueCityPicker" :pickerValueDefault="cityPickerValue" @onCancel="onCancel" @onConfirm="onConfirm"></mpvue-city-picker>
+		<mpvue-city-picker :themeColor="themeColor" ref="mpvueCityPicker" :pickerValueDefault="cityPickerValue" @onCancel="onCancel"
+		 @onConfirm="onConfirm"></mpvue-city-picker>
 	</view>
 </template>
 
@@ -65,15 +66,22 @@
 		},
 		data() {
 			return {
-				editType:'edit',
-				id:'',
-				name:'',
-				tel:'',
-				detailed:'',
-				isDefault:false,
-				cityPickerValue: [0, 0, 1],
+				editType: '',
+				id: '',
+				contact_man: '',
+				mobile: '',
+				address: '',
+				is_default: false,
+				cityPickerValue: [0,0,0],//此处不能删为空，不然初次进入地址选择组件异常
 				themeColor: '#007AFF',
-				region:{label:"请点击选择地址",value:[],cityCode:""}
+				province: '',
+				city: "",
+				area: "",
+				region: {
+					label: "请点击选择地址",
+					value: [],
+					cityCode: ""
+				}
 			};
 		},
 		methods: {
@@ -84,23 +92,38 @@
 				this.$refs.mpvueCityPicker.show()
 			},
 			onConfirm(e) {
+				let cityArr = e.label.split('-');
+				console.log(cityArr)
+				this.province = cityArr[0];
+				this.city = cityArr[1];
+				this.area = cityArr[2];
 				this.region = e;
 				this.cityPickerValue = e.value;
+				console.log(this.cityPickerValue)
 			},
-			isDefaultChange(e){
-				this.isDefault = e.detail.value;
+			isDefaultChange(e) {
+				this.is_default = e.detail.value;
 			},
-			del(){
+			del() {
 				uni.showModal({
 					title: '删除提示',
 					content: '你将删除这个收货地址',
-					success: (res)=>{
+					success: (res) => {
 						if (res.confirm) {
-							uni.setStorage({
-								key:'delAddress',
-								data:{id:this.id},
-								success() {
-									uni.navigateBack();
+							let delUserAddressData =  {
+								id:this.id
+							}
+							this.$Request.post(this.$Urlconf.user.delUserAddress, delUserAddressData).then((res) => {
+								if (res.code == 0) {
+									uni.setStorage({
+										key: 'delAddress',
+										data: {
+											id: this.id
+										},
+										success() {
+											uni.navigateBack();
+										}
+									})
 								}
 							})
 						} else if (res.cancel) {
@@ -108,66 +131,103 @@
 						}
 					}
 				});
-				
+
 			},
-			save(){
-				let data={"name":this.name,"head":this.name.substr(0,1),"tel":this.tel,"address":{"region":this.region,"detailed":this.detailed},"isDefault":this.isDefault}
-				if(this.editType=='edit'){
-					data.id = this.id
+			save() {
+				let addressData = {
+					"contact_man": this.contact_man,
+					"mobile": this.mobile,
+					"province": this.province,
+					"city": this.city,
+					"area": this.area,
+					"address": this.address,
+					"is_default": this.is_default ? 1 : 0,
+					"region": this.region,
+					"cityPickerValue": JSON.stringify(this.cityPickerValue)
 				}
-				if(!data.name){
-					uni.showToast({title:'请输入收件人姓名',icon:'none'});
-					return ;
+				console.log(addressData.cityPickerValue)
+				if (!addressData.contact_man) {
+					uni.showToast({
+						title: '请输入收件人姓名',
+						icon: 'none'
+					});
+					return;
 				}
-				if(!data.tel){
-					uni.showToast({title:'请输入收件人电话号码',icon:'none'});
-					return ;
+				if (!addressData.mobile) {
+					uni.showToast({
+						title: '请输入收件人电话号码',
+						icon: 'none'
+					});
+					return;
 				}
-				if(!data.address.detailed){
-					uni.showToast({title:'请输入收件人详细地址',icon:'none'});
-					return ;
+				if (!addressData.address) {
+					uni.showToast({
+						title: '请输入收件人详细地址',
+						icon: 'none'
+					});
+					return;
 				}
-				if(data.address.region.value.length==0){
-					uni.showToast({title:'请选择收件地址',icon:'none'});
-					return ;
+				if (!this.cityPickerValue) {
+					uni.showToast({
+						title: '请选择收件地址',
+						icon: 'none'
+					});
+					return;
 				}
-				uni.showLoading({
-					title:'正在提交'
-				})
-				//实际应用中请提交ajax,模板定时器模拟提交效果
-				setTimeout(()=>{
-					uni.setStorage({
-						key:'saveAddress',
-						data:data,
-						success() {
-							uni.hideLoading();
-							uni.navigateBack();
+				if (this.editType == 'edit') {
+					addressData.id = this.id
+					this.$Request.post(this.$Urlconf.user.updateUserAddress, addressData).then((res) => {
+						if (res.code == 0) {
+							uni.setStorage({
+								key: 'saveAddress',
+								data: addressData,
+							})
+							uni.navigateBack({
+								delta: 1
+							})
 						}
 					})
-				},300)
-				
-				
+
+				} else {
+					//增加收货地址
+					this.$Request.post(this.$Urlconf.user.addUserAddress, addressData).then((res) => {
+						if (res.code == 0) {
+							addressData.id = res.data;
+							uni.setStorage({
+								key: 'saveAddress',
+								data: addressData,
+							})
+							uni.navigateBack({
+								delta: 1
+							})
+						}
+
+					})
+
+				}
 			}
 		},
 		onLoad(e) {
 			//获取传递过来的参数
-			
+
 			this.editType = e.type;
-			if(e.type=='edit'){
+			if (e.type == 'edit') {
 				uni.getStorage({
-					key:'address',
+					key: 'address',
 					success: (e) => {
 						this.id = e.data.id;
-						this.name = e.data.name;
-						this.tel = e.data.tel;
-						this.detailed = e.data.address.detailed;
-						this.isDefault = e.data.isDefault;
-						this.cityPickerValue = e.data.address.region.value;
-						this.region = e.data.address.region;
+						console.log(this.id)
+						this.contact_man = e.data.contact_man;
+						this.mobile = e.data.mobile;
+						this.address = e.data.address;
+						this.is_default = Boolean(e.data.is_default);
+						this.cityPickerValue = JSON.parse(e.data.cityPickerValue);
+						console.log(this.cityPickerValue)
+						this.region.label = `${e.data.province}-${e.data.city}-${e.data.area}`
 					}
 				})
 			}
-			
+
 		},
 		onBackPress() {
 			if (this.$refs.mpvueCityPicker.showPicker) {
@@ -183,11 +243,11 @@
 	};
 </script>
 <style lang="scss">
-
-.save{
-		view{
+	.save {
+		view {
 			display: flex;
 		}
+
 		position: fixed;
 		bottom: 0;
 		width: 100%;
@@ -195,8 +255,9 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		.btn{
-			box-shadow: 0upx 5upx 10upx rgba(0,0,0,0.4);
+
+		.btn {
+			box-shadow: 0upx 5upx 10upx rgba(0, 0, 0, 0.4);
 			width: 70%;
 			height: 80upx;
 			border-radius: 80upx;
@@ -204,58 +265,67 @@
 			color: #fff;
 			justify-content: center;
 			align-items: center;
-			.icon{
+
+			.icon {
 				height: 80upx;
 				color: #fff;
 				font-size: 30upx;
 				justify-content: center;
 				align-items: center;
 			}
+
 			font-size: 30upx;
 		}
 	}
-	.content{
+
+	.content {
 		display: flex;
 		flex-wrap: wrap;
-		view{
+
+		view {
 			display: flex;
 		}
-		.row{
+
+		.row {
 			width: 94%;
-			
+
 			margin: 0 3%;
 			border-top: solid 1upx #eee;
-			.nominal{
+
+			.nominal {
 				width: 30%;
 				height: 120upx;
 				font-weight: 200;
 				font-size: 30upx;
 				align-items: center;
 			}
-			.input{
+
+			.input {
 				width: 70%;
 				padding: 20upx 0;
 				align-items: center;
 				font-size: 30upx;
-				&.switch{
+
+				&.switch {
 					justify-content: flex-end;
 				}
-				.textarea{
+
+				.textarea {
 					margin: 20upx 0;
 					min-height: 120upx;
 				}
 			}
-			.del{
+
+			.del {
 				width: 100%;
 				height: 100upx;
 				justify-content: center;
 				align-items: center;
 				font-size: 36upx;
 				color: #f06c7a;
-				background-color: rgba(255,0,0,0.05);
+				background-color: rgba(255, 0, 0, 0.05);
 				border-bottom: solid 1upx #eee;
 			}
 		}
 	}
-	
 </style>

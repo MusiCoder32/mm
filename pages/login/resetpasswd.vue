@@ -66,14 +66,10 @@
 					if (res.code == 999) {
 						this.getCodeisDisable = false;
 						this.getCodeBtnColor = "rgba(255,255,255)"
-						this.$api.msg(res.msg, 3000)
 					}
 				}).catch((err) => {
 					this.getCodeisDisable = false;
 					this.getCodeBtnColor = "rgba(255,255,255)"
-					this.$api.msg(this.$i18n.system_exception, 3000)
-				}).finally(() => {
-
 				})
 				//示例用定时器模拟请求效果
 				// setTimeout(()=>{
@@ -152,12 +148,6 @@
 							delta: 1
 						});
 					}
-					this.$api.msg(res.msg);
-				}).catch((err) => {
-					console.log(err)
-					this.$api.msg(this.$i18n.system_exception)
-				}).finally(() => {
-					uni.hideLoading();
 				})
 			},
 		}

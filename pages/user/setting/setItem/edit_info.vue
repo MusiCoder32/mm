@@ -112,9 +112,6 @@
 				let user_text=uni.getStorageInfoSync('user_text')
 				user_text.nickname = this.nickname;
 				user_text.gender = this.gender;
-				uni.showLoading({
-					title: '正在提交'
-				})
 				this.$Request.post(this.$Urlconf.user.updateUserInfo, updateUserInfoData).then((res) => {
 					if (res.code == 0) {
 						uni.setStorage({ //将用户信息更新到storage
@@ -123,11 +120,6 @@
 						})
 						uni.navigateBack();
 					}
-					this.$api.msg(res.msg);
-				}).catch((err) => {
-					console.log(err)
-				}).finally(() => {
-					uni.hideLoading()
 				})
 			}
 		},

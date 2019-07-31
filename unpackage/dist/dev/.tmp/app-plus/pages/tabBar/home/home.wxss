@@ -223,7 +223,7 @@ page {
         transition: all 0.3s ease-out;
 }
 .swiper .swiper-box .indicator .dots.on {
-          width: 33.33333%;
+          width: 25%;
 }
 .category-list {
   width: 92%;

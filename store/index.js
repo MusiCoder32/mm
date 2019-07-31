@@ -9,7 +9,7 @@ const store = new Vuex.Store({
 	state: {
 		hasLogin: false,
 		userInfo: {},
-		authResult: uni.getStorageInfoSync('authRusult'),
+		authResult: uni.getStorageSync('authResult'), //authResult.state获取认证状态
 	},
 	mutations: {
 		hasLogined(state) {
@@ -36,29 +36,21 @@ const store = new Vuex.Store({
 			})
 		},
 		logout(state) {
+			
+			uni.showLoading({
+				mask: true,
+			})
 			state.hasLogin = false;
 			state.userInfo = {};
-			// 			HttpRequest.post(HttpApi.login.logout).then(res => {
-			// 				if (res.code == 0) {
-			// 					uni.showToast({
-			// 						title: res.msg,
-			// 						icon: 'none'
-			// 					});
-			// 
-			// 				} else {
-			// 					uni.showToast({
-			// 						title: res.msg,
-			// 						icon: 'none'
-			// 					});
-			// 				}
-			// 			}).catch((err) => {
-			// 				console.log(err)
-			//  
-			// 			}).finally(() => {
-			// 				clearUserInfo()
-			// 				uni.hideLoading();
-			// 			})
-			clearUserInfo()
+			try {
+				uni.clearStorageSync();
+			} catch (e) {
+				// error
+			}
+			uni.hideLoading()
+			uni.reLaunch({
+				url:'/pages/login/login'
+			})
 		},
 		updateAuth(state, value) {
 			state.authResult = value
@@ -68,23 +60,5 @@ const store = new Vuex.Store({
 
 	}
 })
-
-function clearUserInfo() {
-	uni.removeStorage({ //缓存用户登陆状态
-		key: 'user_text',
-	})
-	uni.removeStorage({ //缓存用户登陆状态
-		key: 'token',
-	})
-	uni.removeStorage({ //缓存用户登陆状态
-		key: 'uid',
-	})
-	uni.removeStorage({ //缓存用户登陆状态
-		key: 'user_wallet',
-	})
-	uni.reLaunch({
-		url: '/pages/tabBar/home/home'
-	})
-}
 
 export default store
