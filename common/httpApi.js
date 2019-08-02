@@ -7,7 +7,7 @@ module.exports = {
 		goodsTypeList: '/goodsTypeList', //商品分类
 		goodsTypeAll: '/goodsTypeAll', //商品分类带数据
 		goodsList: '/goodsList', //所有商品查询接口
-		updateUserAddress: '/updateUserAddress', //修改地址
+		goodsText: '/goodsText', //商品请情
 		delUserAddress: '/delUserAddress', //修改地址
 	},
 	user: {

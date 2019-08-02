@@ -4,28 +4,47 @@
 			<div class="header">
 				<div class="target" v-for="(target, index) in orderbyList" :key="index" @click="select(index)" :class="[target.selected ? 'target-on' : 'target-on1']">
 					<text class="target-text" :class="[target.selected ? 'target-text-on' : '']">{{ target.text }}</text>
-					<text v-if="target.orderbyicon" class="target-icon" :class="[target.selected ? 'target-text-on' : '']">{{ target.orderbyicon[target.orderby] }}</text>
+					<text v-if="target.orderbyicon" class="target-icon" :class="[target.selected ? 'target-text-on' : '']">{{ target.orderbyicon[target.orderIndex] }}</text>
 				</div>
 			</div>
 		</header>
 
 		<div class="place"></div>
+
+		<view v-if="noResult" class="no-result">
+			<view>
+				<text class="target-text">没有找到“{{catName}}”相关的商品</text>
+			</view>
+			<view>
+				<text class="no-result-text">建议:</text>
+				<view>
+					<text class="no-result-text">1.请尝试其它的关键字</text>
+					<text class="no-result-text">2.在分类列表中找到自己喜爱的商品</text>
+				</view>
+			</view>
+		</view>
+
 		<waterfall class="goods-list" column-count="2" column-width="auto">
 			<refresh class="refresh" @refresh="onrefresh" @pullingdown="onpullingdown" :display="refreshing ? 'show' : 'hide'">
 				<text class="refresh-indicator-text">{{ refreshText }}</text>
 				<loading-indicator class="refresh-indicator"></loading-indicator>
 			</refresh>
-			<cell v-for="goods in goodsList" :key="goods.goods_id">
-				<view class="product" @tap="toGoods(goods)">
-					<image class="product-image" mode="widthFix" :src="goods.img"></image>
-					<text class="product-name">{{ goods.name }}</text>
+			<cell style="align-items:flex-start;" v-for="goods in goodsList" :key="goods.goods_id">
+				<view class="product" @click="toGoods(goods)">
+					<text class="product-name">{{ goods.goods_name }}</text>
+					<image class="product-image" mode="widthFix" :src="rootPath + goods.imagePath"></image>
 					<view class="product-info">
-						<text class="product-info-price">{{ goods.price }}</text>
-						<text class="product-info-slogan">{{ goods.slogan }}</text>
+						<view class="" style="display: flex;justify-content: flex-start;flex-direction: row;">
+							<text class="product-info-price">{{ '￥'+goods.market_price }}</text>
+							<text style="font-size: 30px">/</text>
+							<image src="/static/img/icon/dou.png" style="width:40px;height:40px" mode=""></image>
+							<text class="product-info-price">{{ goods.price }}</text>
+						</view>
+						<text class="product-info-slogan">{{ goods.sales_volume }}人已付款</text>
 					</view>
 				</view>
 			</cell>
-			<loading class="loading" @loading="onloading" :display="loadinging ? 'show' : 'hide'">
+			<loading v-show="loadinging" class="loading" @loading="onloading" :display="loadinging ? 'show' : 'hide'">
 				<text class="loading-indicator-text">{{loadingText}}</text>
 				<loading-indicator class="loading-indicator"></loading-indicator>
 			</loading>
@@ -36,98 +55,36 @@
 <script>
 	import HttpApi from '../../../common/httpApi.js'
 	import ROOTPATH from '../../../common/config.js'
+	var _self
 	export default {
 		data() {
 			return {
+				page: 1, //查询数据页数，后台默认每页十条
+				noResult: false,
+				goodsListQueryData: {},
+				rootPath: '',
 				refreshText: '下拉刷新',
 				refreshing: false,
 				loadinging: false,
-				loadingText: '上拉加载',
+				loadingText: '上拉111',
 				orderbyList: [{
 						text: '销量',
 						selected: true,
-						orderbyicon: false,
-						orderby: 0
+						orderbyicon: ['\ue737', '\ue736'],
+						orderby: 'sales_volume',
+						orderIndex: 0
 					},
 					{
 						text: '价格',
 						selected: false,
 						orderbyicon: ['\ue737', '\ue736'],
-						orderby: 0
+						orderby: 'price',
+						orderIndex: 0
 					},
 					// { text: '好评', selected: false, orderbyicon: false, orderby: 0 }
 				],
-				goodsList: [{
-						goods_id: 0,
-						img: 'https://ae01.alicdn.com/kf/HTB1JC1fe.CF3KVjSZJnq6znHFXaG.jpg',
-						name: '商品名称商品名称商品名称商品名称商品名称',
-						price: '￥168',
-						slogan: '1235人付款'
-					},
-					{
-						goods_id: 1,
-						img: 'https://ae01.alicdn.com/kf/HTB1GSqoeWWs3KVjSZFxq6yWUXXav.jpg',
-						name: '商品名称商品名称商品名称商品名称商品名称',
-						price: '￥168',
-						slogan: '1235人付款'
-					},
-					{
-						goods_id: 2,
-						img: 'https://ae01.alicdn.com/kf/HTB16wepeW5s3KVjSZFNq6AD3FXaJ.jpg',
-						name: '商品名称商品名称商品名称商品名称商品名称',
-						price: '￥168',
-						slogan: '1235人付款'
-					},
-					{
-						goods_id: 3,
-						img: 'https://ae01.alicdn.com/kf/HTB1duHtcfBj_uVjSZFpq6A0SXXaJ.jpg',
-						name: '商品名称商品名称商品名称商品名称商品名称',
-						price: '￥168',
-						slogan: '1235人付款'
-					},
-					{
-						goods_id: 4,
-						img: 'https://ae01.alicdn.com/kf/HTB173epeW5s3KVjSZFNq6AD3FXai.jpg',
-						name: '商品名称商品名称商品名称商品名称商品名称',
-						price: '￥168',
-						slogan: '1235人付款'
-					},
-					{
-						goods_id: 5,
-						img: 'https://ae01.alicdn.com/kf/HTB1_Mefe3aH3KVjSZFjq6AFWpXaJ.jpg',
-						name: '商品名称商品名称商品名称商品名称商品名称',
-						price: '￥168',
-						slogan: '1235人付款'
-					},
-					{
-						goods_id: 6,
-						img: 'https://ae01.alicdn.com/kf/HTB1Lu1pe8Cw3KVjSZFuq6AAOpXaI.jpg',
-						name: '商品名称商品名称商品名称商品名称商品名称',
-						price: '￥168',
-						slogan: '1235人付款'
-					},
-					{
-						goods_id: 7,
-						img: 'https://ae01.alicdn.com/kf/HTB1iMife3aH3KVjSZFjq6AFWpXaA.jpg',
-						name: '商品名称商品名称商品名称商品名称商品名称',
-						price: '￥168',
-						slogan: '1235人付款'
-					},
-					{
-						goods_id: 8,
-						img: 'https://ae01.alicdn.com/kf/HTB1D6Sfe4iH3KVjSZPfq6xBiVXaG.jpg',
-						name: '商品名称商品名称商品名称商品名称商品名称',
-						price: '￥168',
-						slogan: '1235人付款'
-					},
-					{
-						goods_id: 9,
-						img: 'https://ae01.alicdn.com/kf/HTB1IjSfe4iH3KVjSZPfq6xBiVXa4.jpg',
-						name: '商品名称商品名称商品名称商品名称商品名称',
-						price: '￥168',
-						slogan: '1235人付款'
-					}
-				]
+				goodsList: [],
+				catName: ''
 			};
 		},
 		beforeCreate() {
@@ -138,10 +95,16 @@
 			});
 		},
 		created() {
-			let goodsListData = {
-				key_word: uni.getStorageSync('key_word')
+			_self = this;
+			_self.goodsListQueryData = {
+				orderby: 'sales_volume',
+				sort: 'asc'
 			};
-			this.httpRequest(HttpApi.home.goodsList, goodsListData)
+			//合并缓存中的搜索条件
+			Object.assign(_self.goodsListQueryData, uni.getStorageSync('queryData'))
+			console.log(_self.goodsListQueryData);
+			this.rootPath = ROOTPATH.APIHOST + ROOTPATH.IMGPATH
+			this.httpRequest(_self.goodsListQueryData)
 		},
 		mounted() {
 			// nvue页面下，关闭下拉刷新，用waterfall实现下拉和上拉刷新。
@@ -154,10 +117,9 @@
 			this.init();
 		},
 		methods: {
-			httpRequest(url, data) {
-				uni.hideLoading()
-				let header =  "application/x-www-form-urlencoded";
-				url = ROOTPATH.APIHOST + ROOTPATH.APIPATH + url;
+			httpRequest(data, add = false) {
+				let header = "application/x-www-form-urlencoded";
+				let url = ROOTPATH.APIHOST + ROOTPATH.APIPATH + HttpApi.home.goodsList;
 				uni.request({
 					url: url,
 					data: data,
@@ -168,11 +130,26 @@
 					success: function(result) {
 						if (result.data.code != 0) {
 							uni.showToast({
-								title: result.data.msg,
+								title: result.msg,
 								icon: 'none'
 							})
 						}
-						console.log(result.data);
+						// 关闭刷新
+						if (_self.refreshing) {
+							_self.refreshing = false
+						}
+						// 关闭上拉
+						if (_self.loadinging) {
+							_self.loadinging = false
+						}
+						// 判断是增加数据还是更新数据
+						if (add) {
+							_self.goodsList.push(result.data.data.data)
+						} else {
+							_self.goodsList = result.data.data.data
+						}
+						//是否展示查询不到界面
+						_self.noResult = !_self.goodsList.length
 					},
 					fail: function(e) {
 						uni.hideLoading()
@@ -192,20 +169,19 @@
 			},
 			setTitle() {
 				//设置标题
-				let catName = uni.getStorageSync('catName');
+				this.catName = uni.getStorageSync('catName');
 				uni.setNavigationBarTitle({
-					title: catName
+					title: this.catName
 				});
 			},
 			select(index) {
-				let tmpTis = this.orderbyList[index].text + '排序 ';
+				uni.showLoading({
+					mask: true
+				})
 				if (this.orderbyList[index].orderbyicon) {
-					let type = this.orderbyList[index].orderby == 0 ? '升序' : '降序';
 					if (this.orderbyList[index].selected) {
-						type = this.orderbyList[index].orderby == 0 ? '降序' : '升序';
-						this.orderbyList[index].orderby = this.orderbyList[index].orderby == 0 ? 1 : 0;
+						this.orderbyList[index].orderIndex = this.orderbyList[index].orderIndex == 0 ? 1 : 0;
 					}
-					tmpTis += type;
 				}
 				this.orderbyList[index].selected = true;
 				let len = this.orderbyList.length;
@@ -214,53 +190,62 @@
 						this.orderbyList[i].selected = false;
 					}
 				}
-				uni.showToast({
-					title: tmpTis,
-					icon: 'none'
-				});
+				_self.goodsListQueryData.orderby = this.orderbyList[index].orderby
+				_self.goodsListQueryData.sort = this.orderbyList[index].orderIndex ? 'desc' : 'asc'
+				this.httpRequest(_self.goodsListQueryData)
 			},
 			onrefresh(event) {
 				this.refreshText = '正在刷新';
 				this.refreshing = true;
-				setTimeout(() => {
-					this.refreshText = '下载刷新';
-					this.refreshing = false;
-				}, 2000);
+				this.page = 1;
+				this.goodsListQueryData.page = this.page;
+				this.httpRequest(_self.goodsListQueryData)
 			},
-			onpullingdown(event) {
-				if (event.pullingDistance <= -200) {
-					this.refreshText = '放开刷新';
-				}
-			},
+			onpullingdown(event) {},
 			onloading(event) {
-				this.loadinging = true;
-				setTimeout(() => {
-					let len = this.goodsList.length;
-					if (len >= 40) {
-						uni.showToast({
-							title: '没有更多了',
-							icon: 'none'
-						});
-						this.loadinging = false;
-						return false;
-					} else {
-						this.loadingText = "正在加载...";
-					}
-					let tmpList = JSON.parse(JSON.stringify(this.goodsList));
-					let end_goods_id = this.goodsList[len - 1].goods_id;
-					for (let i = 1; i <= 10; i++) {
-						let row = tmpList[i - 1];
-						row.goods_id = end_goods_id + i;
-						this.goodsList.push(row);
-					}
+				if (this.goodsList.length < this.page * 10) {
+					uni.showToast({
+						title: "暂无更多商品",
+						icon: 'none'
+					})
 					this.loadinging = false;
-				}, 1000);
+					return;
+				}
+				this.page += 1;
+				this.goodsListQueryData.page = this.page;
+				this.httpRequest(_self.goodsListQueryData)
+				this.onloading = true;
+			},
+			//商品跳转
+			toGoods(e) {
+				uni.showLoading({
+					mask:true
+				})
+				uni.setStorageSync('imagePath',e.imagePath)
+				uni.navigateTo({
+					url: '/pages/goods/goods?goods_id='+e.goods_id
+				});
 			}
 		}
 	};
 </script>
 
 <style>
+	.no-result {
+		padding: 30px 0 0 30px;
+	}
+
+	.no-result-suggest {
+		color: #666;
+	}
+
+	.no-result-text {
+		padding-left: 60px;
+		margin-top: 20px;
+		color: #999;
+		font-size: 24px;
+	}
+
 	.content {
 		flex-direction: column;
 	}
@@ -318,6 +303,7 @@
 		height: 80px;
 	}
 
+
 	.goods-list {
 		width: 750px;
 		padding: 0 30px 30px 30px;
@@ -348,8 +334,8 @@
 	}
 
 	.product-info {
-		flex-direction: row;
-		justify-content: space-between;
+		flex-direction: column;
+		justify-content: flex-start;
 		align-items: flex-end;
 		width: 335px%;
 		padding: 10px 13px;

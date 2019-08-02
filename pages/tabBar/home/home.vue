@@ -107,7 +107,7 @@
 	export default {
 		data() {
 			return {
-				searchData:"",
+				searchData: "",
 				rootPath: '',
 				showHeader: true,
 				afterHeaderOpacity: 1, //不透明度
@@ -140,43 +140,42 @@
 					}
 				],
 				// 分类菜单
-				categoryList: [
-					{
-						id: 7,
+				categoryList: [{
+						id: 13,
 						name: '蔬菜',
 						img: '/static/img/category/7.png'
 					},
 					{
-						id: 8,
+						id: 12,
 						name: '水果',
 						img: '/static/img/category/8.png'
 					}, {
-						id: 1,
+						id: 14,
 						name: '水产',
 						img: '/static/img/category/1.png'
 					},
 					{
-						id: 2,
+						id: 15,
 						name: '肉禽',
 						img: '/static/img/category/2.png'
 					},
 					{
-						id: 3,
+						id: 17,
 						name: '酒饮',
 						img: '/static/img/category/3.png'
 					},
 					{
-						id: 4,
+						id: 16,
 						name: '米油面',
 						img: '/static/img/category/4.png'
 					},
 					{
-						id: 5,
+						id: 18,
 						name: '积分',
 						img: '/static/img/category/5.png'
 					},
 					{
-						id: 6,
+						id: 19,
 						name: '礼品',
 						img: '/static/img/category/6.png'
 					}
@@ -300,7 +299,6 @@
 			// 该地址用于获取图片资源
 			this.rootPath = this.$RootHttp.APIHOST + this.$RootHttp.IMGPATH
 			this.$Request.get(this.$Urlconf.home.getAdList).then((res) => {
-				console.log(res)
 				if (res.code == 0) {
 					this.swiperList = res.data
 				}
@@ -439,7 +437,10 @@
 			},
 			//搜索跳转
 			toSearch() {
-				this.toCategory({name:'搜索结果'});
+				uni.setStorageSync('catName', '搜索结果');
+				uni.navigateTo({
+					url: '../../goods/goods-list/goods-list'
+				});
 			},
 			//轮播图跳转
 			toSwiper(e) {
@@ -451,7 +452,11 @@
 			//分类跳转
 			toCategory(e) {
 				//uni.showToast({title: e.name,icon:"none"});
+				uni.showLoading({
+					mask:true
+				})
 				uni.setStorageSync('catName', e.name);
+				uni.setStorageSync('queryData', {parent:e.id});
 				uni.navigateTo({
 					url: '../../goods/goods-list/goods-list?cid=' + e.id + '&name=' + e.name
 				});

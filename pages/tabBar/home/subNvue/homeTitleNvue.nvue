@@ -65,8 +65,11 @@ export default {
 			this.city = city;
 		},
 		inputfocus() {
-			console.log(456)
-			uni.setStorageSync("key_word",this.searchData)
+			uni.showLoading({
+				title:'查询中',
+				mask:true
+			})
+			uni.setStorageSync('queryData', {key_word:this.searchData});
 			this.searchData = '',
 			this.subNVue.postMessage({
 				type: 'focus'
