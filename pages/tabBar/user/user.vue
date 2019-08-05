@@ -29,7 +29,7 @@
 				</view>
 			</view>
 			<!-- 二维码按钮 -->
-<!-- 			<view class="erweima" @tap="toMyQR">
+			<!-- 			<view class="erweima" @tap="toMyQR">
 				<view class="icon qr"></view>
 			</view> -->
 		</view>
@@ -55,16 +55,16 @@
 			<!-- 余额 -->
 			<view class="balance-info">
 				<view class="left">
-					<view class="box">
-						<view class="num">{{}}</view>
+					<view v-if="security" class="box">
+						<view class="num">{{user_wallet.packets_integral}}</view>
 						<view class="text">积分</view>
 					</view>
-					<view class="box">
-						<view class="num">{{}}</view>
-						<view class="text">佣金</view>
+					<view v-if="security" class="box">
+						<view class="num">{{user_wallet.shopping_integral}}</view>
+						<view class="text">豆</view>
 					</view>
 					<view class="box">
-						<view class="num">{{}}</view>
+						<view class="num">{{user_wallet.account_balance}}</view>
 						<view class="text">余额</view>
 					</view>
 				</view>
@@ -77,6 +77,28 @@
 					</view>
 				</view>
 			</view>
+			<!-- 提现 -->
+			<view v-if="security" class="balance-info" style="border-top: solid 1upx #17e6a1;padding-top: 10upx;">
+				<view class="left">
+					<view  class="box">
+						<view class="num">{{user_wallet.account_achievement}}</view>
+						<view class="text">业绩</view>
+					</view>
+					<view class="box">
+						<view class="num">{{user_wallet.account_cash}}</view>
+						<view class="text">提现金额</view>
+					</view>
+				</view>
+				<view class="right">
+					<view class="box" @tap="toDeposit">
+						<view class="img">
+							<view class="icon chongzhi"></view>
+						</view>
+						<view class="text">提现</view>
+					</view>
+				</view>
+			</view>
+
 		</view>
 		<!-- 工具栏 -->
 		<view class="toolbar">
@@ -102,6 +124,7 @@
 	export default {
 		data() {
 			return {
+				security:false,
 				head_portrait: '',
 				currentRoute: '',
 				isfirst: true,
@@ -221,6 +244,9 @@
 		},
 		onShow() {
 			this.currentRoute = getCurrentPages()[0] ? getCurrentPages()[0].route : "pages/tabBar/home/home"
+			//获取用户钱包余额
+			this.user_wallet = uni.getStorageSync('userWallet')
+			//判断用户头像是否保存于本地
 			uni.getStorage({
 				key: 'user_text',
 				success: (res) => {
@@ -260,6 +286,7 @@
 					// this.hasLogined()
 				}
 			});
+			//在登陆时已将认证状态存入全局。只有状态为认证中每次进入时，查询认证状态。
 			if (this.authResult.state === 0) {
 				this.$Request.post(this.$Urlconf.cardAuth.getUserAuthentication).then((res) => {
 					if (res.code == 0) {

@@ -63,6 +63,10 @@
 .addr .tel-name .tel {
       margin-left: 40rpx;
 }
+.addr .no-select {
+    height: 80rpx;
+    line-height: 80rpx;
+}
 .addr .addres {
     width: 100%;
     font-size: 26rpx;
@@ -175,14 +179,14 @@
                     align-items: flex-end;
 }
 .buy-list .row .goods-info .info .price-number .number .input {
-              width: 60rpx;
-              height: 60rpx;
+              width: 70rpx;
+              height: 50rpx;
               margin: 0 10rpx;
-              background-color: #f3f3f3;
+              background-color: #d5d5d5;
 }
 .buy-list .row .goods-info .info .price-number .number .input input {
-                width: 60rpx;
-                height: 60rpx;
+                width: 70rpx;
+                height: 50rpx;
                 display: -webkit-box;
                 display: -webkit-flex;
                 display: -ms-flexbox;
@@ -200,16 +204,16 @@
 }
 .buy-list .row .goods-info .info .price-number .number .sub,
             .buy-list .row .goods-info .info .price-number .number .add {
-              width: 45rpx;
-              height: 45rpx;
-              background-color: #f3f3f3;
+              width: 50rpx;
+              height: 50rpx;
+              background-color: #d5d5d5;
               border-radius: 5rpx;
 }
 .buy-list .row .goods-info .info .price-number .number .sub .icon,
               .buy-list .row .goods-info .info .price-number .number .add .icon {
                 font-size: 22rpx;
-                width: 45rpx;
-                height: 45rpx;
+                width: 50rpx;
+                height: 50rpx;
                 display: -webkit-box;
                 display: -webkit-flex;
                 display: -ms-flexbox;

@@ -34,17 +34,19 @@
 					<text class="product-name">{{ goods.goods_name }}</text>
 					<image class="product-image" mode="widthFix" :src="rootPath + goods.imagePath"></image>
 					<view class="product-info">
-						<view class="" style="display: flex;justify-content: flex-start;flex-direction: row;">
-							<text class="product-info-price">{{ '￥'+goods.market_price }}</text>
-							<text style="font-size: 30px">/</text>
-							<image src="/static/img/icon/dou.png" style="width:40px;height:40px" mode=""></image>
-							<text class="product-info-price">{{ goods.price }}</text>
-						</view>
+								<view v-if="goods.type==1" class="price">{{'￥'+goods.market_price}}</view>
+								<view v-if="goods.type==3" class="price">积分:{{goods.integral_price}}</view>
+								<view v-if="goods.type==2" class="price" style="display: flex;justify-content: flex-e;flex-direction: row;">
+									<text class="product-info-price">{{ '￥'+goods.market_price }}</text>
+									<text style="font-size: 30upx;padding-top:7upx">/</text>
+									<image src="/static/img/icon/dou.png" style="width:40upx;height:40upx" mode=""></image>
+									<text class="product-info-price" style="padding-top:7upx">{{ goods.price }}</text>
+								</view>
 						<text class="product-info-slogan">{{ goods.sales_volume }}人已付款</text>
 					</view>
 				</view>
 			</cell>
-			<loading v-show="loadinging" class="loading" @loading="onloading" :display="loadinging ? 'show' : 'hide'">
+			<loading class="loading" @loading="onloading" :display="loadinging ? 'show' : 'hide'">
 				<text class="loading-indicator-text">{{loadingText}}</text>
 				<loading-indicator class="loading-indicator"></loading-indicator>
 			</loading>
@@ -66,7 +68,7 @@
 				refreshText: '下拉刷新',
 				refreshing: false,
 				loadinging: false,
-				loadingText: '上拉111',
+				loadingText: '上拉加载',
 				orderbyList: [{
 						text: '销量',
 						selected: true,
@@ -196,34 +198,30 @@
 			},
 			onrefresh(event) {
 				this.refreshText = '正在刷新';
-				this.refreshing = true;
+				this.refreshing = true
 				this.page = 1;
 				this.goodsListQueryData.page = this.page;
 				this.httpRequest(_self.goodsListQueryData)
 			},
 			onpullingdown(event) {},
 			onloading(event) {
-				if (this.goodsList.length < this.page * 10) {
-					uni.showToast({
-						title: "暂无更多商品",
-						icon: 'none'
-					})
-					this.loadinging = false;
-					return;
+				this.loadingText = '正在加载';
+				this.loadinging = true;
+				if (this.goodsList.length >= this.page * 10) {
+					this.page += 1;
 				}
-				this.page += 1;
 				this.goodsListQueryData.page = this.page;
 				this.httpRequest(_self.goodsListQueryData)
-				this.onloading = true;
 			},
 			//商品跳转
 			toGoods(e) {
 				uni.showLoading({
-					mask:true
+					mask: true
 				})
-				uni.setStorageSync('imagePath',e.imagePath)
+				//存储商品默认展示图
+				uni.setStorageSync('imagePath', e.imagePath)
 				uni.navigateTo({
-					url: '/pages/goods/goods?goods_id='+e.goods_id
+					url: '/pages/goods/goods?goods_id=' + e.goods_id
 				});
 			}
 		}
@@ -305,6 +303,7 @@
 
 
 	.goods-list {
+		justify-content: flex-end !important;
 		width: 750px;
 		padding: 0 30px 30px 30px;
 		background-color: #ffffff;

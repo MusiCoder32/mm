@@ -303,6 +303,7 @@
 					this.swiperList = res.data
 				}
 			})
+
 			// #ifdef APP-PLUS
 			this.nVueTitle = uni.getSubNVueById('homeTitleNvue');
 			this.nVueTitle.onMessage(res => {
@@ -334,6 +335,25 @@
 			this.Timer();
 			//加载活动专区
 			this.loadPromotion();
+			// 提前下载购物车数据
+			this.$Request.post(this.$Urlconf.cart.cartList).then((res) => {
+				if (res.code == 0) {
+					uni.setStorage({
+						key: 'cartList',
+						data: res.data
+					})
+				}
+			})
+			//提前查询用户钱包余额
+			this.$Request.post(this.$Urlconf.user.getUserWallet).then((res) => {
+				if (res.code == 0) {
+					uni.setStorage({
+						key: 'userWallet',
+						data: res.data
+					})
+				}
+			})
+
 		},
 		methods: {
 			...mapMutations(['login', 'logout']),
@@ -453,10 +473,12 @@
 			toCategory(e) {
 				//uni.showToast({title: e.name,icon:"none"});
 				uni.showLoading({
-					mask:true
+					mask: true
 				})
 				uni.setStorageSync('catName', e.name);
-				uni.setStorageSync('queryData', {parent:e.id});
+				uni.setStorageSync('queryData', {
+					parent: e.id
+				});
 				uni.navigateTo({
 					url: '../../goods/goods-list/goods-list?cid=' + e.id + '&name=' + e.name
 				});

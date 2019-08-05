@@ -5,18 +5,23 @@
 			<view class="icon">
 				<image src="../../static/img/addricon.png" mode=""></image>
 			</view>
-			<view class="right">
+			<view class="right" v-if="addressUsed.id">
 				<view class="tel-name">
 					<view class="name">
-						{{recinfo.name}}
+						{{addressUsed.contact_man}}
 					</view>
-					<view class="tel">
-						{{recinfo.tel}}
+					<view class="name">
+						{{addressUsed.mobile}}
 					</view>
 				</view>
 				<view class="addres">
-					{{recinfo.address.region.label}}
-					{{recinfo.address.detailed}}
+					{{addressUsed.province}}{{addressUsed.city}}{{addressUsed.area}}
+					{{addressUsed.address}}
+				</view>
+			</view>
+			<view class="right" v-if="!addressUsed.id">
+				<view class="tel-name no-select">
+					<text style="color:#FF0000">*</text>请选择收货地址>
 				</view>
 			</view>
 		</view>
@@ -25,19 +30,26 @@
 			<view class="row" v-for="(row,index) in buylist" :key="index">
 				<view class="goods-info">
 					<view class="img">
-						<image :src="row.imagePath"></image>
+						<image :src="rootPath+row.imagePath"></image>
 					</view>
 					<view class="info">
 						<view class="title">{{row.goods_name}}</view>
-						<view class="spec">已选数量:{{row.number}}</view>
+						<view class="spec">已选数量:{{row.goods_number}}</view>
 						<view class="price-number">
-							<view class="price">￥{{row.price*row.number}}</view>
-							<view class="number">
+							<view v-if="row.type==1" class="price">￥{{row.market_price*row.goods_number|toFixed}}</view>
+							<view v-if="row.type==3" class="price">积分:{{row.integral_price*row.goods_number|toFixed}}</view>
+							<view v-if="row.type==2" class="price" style="display: flex;justify-content: flex-e;flex-direction: row;">
+								<text class="product-info-price">￥{{row.market_price*row.goods_number|toFixed }}</text>
+								<text style="font-size: 30upx;padding-top:7upx">/</text>
+								<image src="/static/img/icon/dou.png" style="width:40upx;height:40upx" mode=""></image>
+								<text class="product-info-price" style="padding-top:7upx">{{ row.price*row.goods_number|toFixed }}</text>
+							</view>
+							<view v-if='rightNow' class="number">
 								<view class="sub" @tap.stop="sub(index)">
 									<view class="icon jian"></view>
 								</view>
 								<view class="input" @tap.stop="discard">
-									<input type="number" v-model="row.number" @blur="resetNum" />
+									<input type="number" v-model="row.goods_number" @blur="resetNum" />
 								</view>
 								<view class="add" @tap.stop="add(index)">
 									<view class="icon jia"></view>
@@ -50,14 +62,14 @@
 		</view>
 		<!-- 提示-备注 -->
 		<view class="order">
-			<view class="row">
+			<!-- 			<view class="row">
 				<view class="left">
 					积分 :
 				</view>
 				<view class="right">
 					已扣除{{int}}积分抵扣{{deduction|toFixed}}元
 				</view>
-			</view>
+			</view> -->
 			<view class="row">
 				<view class="left">
 					备注 :
@@ -73,8 +85,13 @@
 				<view class="nominal">
 					商品金额
 				</view>
-				<view class="content">
-					￥{{goodsPrice|toFixed}}
+				<view v-if="type==1" class="content">￥{{sumPrice|toFixed}}</view>
+				<view v-if="type==3" class="content">积分:{{sumIntegral|toFixed}}</view>
+				<view v-if="type==2" class="content" style="display: flex;justify-content: flex-e;flex-direction: row;">
+					<text class="product-info-price"> ￥{{sumMarketPrice|toFixed }}</text>
+					<text style="font-size: 30upx;padding-top:7upx">/</text>
+					<image src="/static/img/icon/dou.png" style="width:40upx;height:40upx" mode=""></image>
+					<text class="product-info-price" style="padding-top:7upx">{{sumPrice|toFixed}}</text>
 				</view>
 			</view>
 			<view class="row">
@@ -85,14 +102,14 @@
 					￥+{{freight|toFixed}}
 				</view>
 			</view>
-			<view class="row">
+			<!-- 			<view class="row">
 				<view class="nominal">
 					积分抵扣
 				</view>
 				<view class="content">
 					￥-{{deduction|toFixed}}
 				</view>
-			</view>
+			</view> -->
 		</view>
 		<view class="blck">
 
@@ -111,32 +128,39 @@
 	export default {
 		data() {
 			return {
-				rightnow: true,
+				type: 2,
+				rootPath: '',
+				rightNow: true,
 				number: 1,
 				buylist: [], //订单列表
-				goodsPrice: 0.0, //商品合计价格
-				sumPrice: 0.0, //用户付款价格
-				freight: 12.00, //运费
+				sumPrice: '0.00',
+				sumMarketPrice: '0.00',
+				sumIntegral: '0.00',
+				freight: 0, //运费
 				note: '', //备注
 				int: 1200, //抵扣积分
 				deduction: 0, //抵扣价格
-				recinfo: {
-					id: 1,
-					name: "大黑哥",
-					head: "大",
-					tel: "18816881688",
-					address: {
-						region: {
-							"label": "广东省-深圳市-福田区",
-							"value": [18, 2, 1],
-							"cityCode": "440304"
-						},
-						detailed: '深南大道1111号无名摩登大厦6楼A2'
-					},
-					isDefault: true
+				addressUsed: {
+					id: '',
+					"contact_man": '',
+					"mobile": '',
+					"province": '',
+					"city": '',
+					"area": '',
+					"address": '',
+					"is_default": '',
+					"region": '',
+					"cityPickerValue": ''
 				}
 
 			};
+		},
+		onLoad(e) {
+			console.log(e.rightNow);
+			if (e.rightNow == 0) {
+				this.rightNow = false
+			}
+			this.rootPath = this.$RootHttp.APIHOST + this.$RootHttp.IMGPATH;
 		},
 		onShow() {
 			//页面显示时，加载订单信息
@@ -144,22 +168,50 @@
 				key: 'buylist',
 				success: (ret) => {
 					this.buylist = ret.data;
-					this.goodsPrice = 0;
+					this.type = ret.data[0].type;
+					this.sumPrice = 0;
+					this.sumMarketPrice = 0;
+					this.sumIntegral = 0;
 					//合计
 					let len = this.buylist.length;
 					for (let i = 0; i < len; i++) {
-						this.goodsPrice = this.goodsPrice + (this.buylist[i].number * this.buylist[i].price);
+						this.sumPrice = this.sumPrice + (this.buylist[i].goods_number * this.buylist[i].price);
+						console.log(this.sumPrice);
+						this.sumMarketPrice = this.sumMarketPrice + (this.buylist[i].goods_number * this.buylist[i].market_price);
+						console.log(this.sumMarketPrice);
+
+						this.sumIntegral = this.sumIntegral + (this.buylist[i].goods_number * this.buylist[i].integral_price);
 					}
-					this.deduction = this.int / 100;
-					this.sumPrice = this.goodsPrice - this.deduction + this.freight;
+					// this.deduction = this.int / 100;
+					// this.sumPrice = this.goodsPrice + this.freight;
 				}
 			});
 			//获取默认地址
-			console.log('在登陆界面存入默认地址，在修改界面及时更新默认地址');
 			uni.getStorage({
-				key: 'addressDefault',
+				key: 'addressList',
 				success: (e) => {
-					this.recinfo = e.data;
+					console.log(e.data);
+					if (e.data.length >= 1) {
+						this.addressUsed = e.data.filter((item) => {
+							if (item.is_default == 1) {
+								return item
+							}
+						});
+						console.log(this.addressUsed);
+						if (this.addressUsed.id == '') {
+							this.addressUsed = e.data[0]
+						}
+						console.log(this.addressUsed = e.data[0]);
+						console.log(this.addressUsed);
+					} else {
+						this.addressUsed = [];
+						uni.showToast({
+							title: '您还未保存任何收货地址，请先设置收货地址',
+							icon: 'none',
+							duration: 2000
+						})
+					}
+
 				}
 			})
 		},
@@ -176,17 +228,25 @@
 			}
 		},
 		methods: {
+			//选择收货地址
+			selectAddress() {
+				uni.navigateTo({
+					url: '../user/address/address?type=select'
+				})
+			},
 			//防止用户输入数量不在正常范围
 			resetNum() {
 				if (this.buylist[0].number <= 1) {
 					this.buylist[0].number = 1;
-				}
-				else if (this.buylist[0].number >= 100) {
+					uni.showToast({
+						title: '请输入1-100之间的数值'
+					})
+				} else if (this.buylist[0].number >= 100) {
 					this.buylist[0].number = 100;
+					uni.showToast({
+						title: '请输入1-100之间的数值'
+					})
 				}
-				uni.showToast({
-					title:'请输入1-100之间的数值'
-				})
 			},
 			// 减少数量
 			sub(index) {
@@ -214,11 +274,11 @@
 			toPay() {
 				//商品列表
 				let paymentOrder = [];
-				let goodsid = [];
+				let carIdData = [];//用于最后删除购物车
 				let len = this.buylist.length;
 				for (let i = 0; i < len; i++) {
 					paymentOrder.push(this.buylist[i]);
-					goodsid.push(this.buylist[i].id);
+					carIdData.push(this.buylist[i].car_id);
 				}
 				if (paymentOrder.length == 0) {
 					uni.showToast({
@@ -231,6 +291,7 @@
 				uni.showLoading({
 					title: '正在提交订单...'
 				})
+				uni.setStorageSync('car_id',carIdData)
 				setTimeout(() => {
 					uni.setStorage({
 						key: 'paymentOrder',
@@ -245,12 +306,6 @@
 				}, 1000)
 
 			},
-			//选择收货地址
-			selectAddress() {
-				uni.navigateTo({
-					url: '../user/address/address?type=select'
-				})
-			}
 		}
 	}
 </script>
@@ -284,6 +339,11 @@
 			.tel {
 				margin-left: 40upx;
 			}
+		}
+
+		.no-select {
+			height: 80upx;
+			line-height: 80upx
 		}
 
 		.addres {
@@ -371,14 +431,14 @@
 							align-items: flex-end;
 
 							.input {
-								width: 60upx;
-								height: 60upx;
+								width: 70upx;
+								height: 50upx;
 								margin: 0 10upx;
-								background-color: #f3f3f3;
+								background-color: #d5d5d5;
 
 								input {
-									width: 60upx;
-									height: 60upx;
+									width: 70upx;
+									height: 50upx;
 									display: flex;
 									justify-content: center;
 									align-items: center;
@@ -389,15 +449,15 @@
 
 							.sub,
 							.add {
-								width: 45upx;
-								height: 45upx;
-								background-color: #f3f3f3;
+								width: 50upx;
+								height: 50upx;
+								background-color: #d5d5d5;
 								border-radius: 5upx;
 
 								.icon {
 									font-size: 22upx;
-									width: 45upx;
-									height: 45upx;
+									width: 50upx;
+									height: 50upx;
 									display: flex;
 									justify-content: center;
 									align-items: center;

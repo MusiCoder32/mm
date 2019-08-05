@@ -2,6 +2,12 @@
  * API接口配置文件
  */
 module.exports = {
+
+	cart: {
+		cartList: '/carList', //查询购物车数据
+		cartAdd: '/addCar', //加入购物车
+		cartUpdate: '/changeCar', //修改购物车
+	},
 	home: {
 		getAdList: '/getAdList', //首页轮播图
 		goodsTypeList: '/goodsTypeList', //商品分类
@@ -17,6 +23,7 @@ module.exports = {
 		defaultUserAddress: '/defaultUserAddress', //设为默认地址
 		updateUserAddress: '/updateUserAddress', //修改地址
 		delUserAddress: '/delUserAddress', //修改地址
+		getUserWallet: '/getUserWallet', //获取钱包余额
 	},
 	login: {
 		signin: "/login", // 登陆 
