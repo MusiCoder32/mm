@@ -45,13 +45,13 @@
 								<text class="product-info-price" style="padding-top:7upx">{{ row.price*row.goods_number|toFixed }}</text>
 							</view>
 							<view v-if='rightNow' class="number">
-								<view class="sub" @tap.stop="sub(index)">
+								<view class="sub" @click="sub(index)">
 									<view class="icon jian"></view>
 								</view>
-								<view class="input" @tap.stop="discard">
-									<input type="number" v-model="row.goods_number" @blur="resetNum" />
+								<view class="input">
+									<input type="number" maxlength="3" v-model="row.goods_number" @blur="resetNum" />
 								</view>
-								<view class="add" @tap.stop="add(index)">
+								<view class="add" @click="add(index)">
 									<view class="icon jia"></view>
 								</view>
 							</view>
@@ -116,8 +116,8 @@
 		</view>
 		<view class="footer">
 			<view class="settlement">
-				<view class="sum">合计:<view class="money">￥{{sumPrice|toFixed}}</view>
-				</view>
+<!-- 				<view class="sum">合计:<view class="money">￥{{sumPrice|toFixed}}</view>
+				</view> -->
 				<view class="btn" @tap="toPay">提交订单</view>
 			</view>
 		</view>
@@ -132,7 +132,37 @@
 				rootPath: '',
 				rightNow: true,
 				number: 1,
-				buylist: [], //订单列表
+				buylist: [{
+					"car_id": 23,
+					"goods_id": 33,
+					"goods_name": "排骨",
+					"market_price": "40.00",
+					"price": "20.00",
+					"integral_price": 0,
+					"imagePath": "/upload/goods/5d43ddd9cf092.jpg",
+					"goods_number": 1,
+					"type": 2
+				}, {
+					"car_id": 24,
+					"goods_id": 32,
+					"goods_name": "猪尾",
+					"market_price": "30.00",
+					"price": "15.00",
+					"integral_price": 0,
+					"imagePath": "/upload/goods/5d43dda62007d.jpg",
+					"goods_number": 1,
+					"type": 2
+				}, {
+					"car_id": 22,
+					"goods_id": 31,
+					"goods_name": "五花肉",
+					"market_price": "30.00",
+					"price": "15.00",
+					"integral_price": 0,
+					"imagePath": "/upload/goods/5d43d20fd5fd8.jpg",
+					"goods_number": 1,
+					"type": 2
+				}], //订单列表
 				sumPrice: '0.00',
 				sumMarketPrice: '0.00',
 				sumIntegral: '0.00',
@@ -168,20 +198,9 @@
 				key: 'buylist',
 				success: (ret) => {
 					this.buylist = ret.data;
+					console.log(JSON.stringify(this.buylist));
 					this.type = ret.data[0].type;
-					this.sumPrice = 0;
-					this.sumMarketPrice = 0;
-					this.sumIntegral = 0;
-					//合计
-					let len = this.buylist.length;
-					for (let i = 0; i < len; i++) {
-						this.sumPrice = this.sumPrice + (this.buylist[i].goods_number * this.buylist[i].price);
-						console.log(this.sumPrice);
-						this.sumMarketPrice = this.sumMarketPrice + (this.buylist[i].goods_number * this.buylist[i].market_price);
-						console.log(this.sumMarketPrice);
-
-						this.sumIntegral = this.sumIntegral + (this.buylist[i].goods_number * this.buylist[i].integral_price);
-					}
+					this.sum()
 					// this.deduction = this.int / 100;
 					// this.sumPrice = this.goodsPrice + this.freight;
 				}
@@ -190,19 +209,15 @@
 			uni.getStorage({
 				key: 'addressList',
 				success: (e) => {
-					console.log(e.data);
 					if (e.data.length >= 1) {
 						this.addressUsed = e.data.filter((item) => {
 							if (item.is_default == 1) {
 								return item
 							}
 						});
-						console.log(this.addressUsed);
-						if (this.addressUsed.id == '') {
+						if (!this.addressUsed.id) {
 							this.addressUsed = e.data[0]
 						}
-						console.log(this.addressUsed = e.data[0]);
-						console.log(this.addressUsed);
 					} else {
 						this.addressUsed = [];
 						uni.showToast({
@@ -211,7 +226,6 @@
 							duration: 2000
 						})
 					}
-
 				}
 			})
 		},
@@ -236,31 +250,46 @@
 			},
 			//防止用户输入数量不在正常范围
 			resetNum() {
-				if (this.buylist[0].number <= 1) {
-					this.buylist[0].number = 1;
+				if (this.buylist[0].goods_number <= 1) {
+					this.buylist[0].goods_number = 1;
 					uni.showToast({
 						title: '请输入1-100之间的数值'
 					})
-				} else if (this.buylist[0].number >= 100) {
-					this.buylist[0].number = 100;
+				} else if (this.buylist[0].goods_number >= 100) {
+					this.buylist[0].goods_number = 100;
 					uni.showToast({
 						title: '请输入1-100之间的数值'
 					})
 				}
+				this.sum()
 			},
 			// 减少数量
 			sub(index) {
-				if (this.buylist[0].number <= 1) {
+				if (this.buylist[0].goods_number <= 1) {
 					return;
 				}
-				this.buylist[0].number--;
+				this.buylist[0].goods_number--;
+				this.sum()
 			},
 			// 增加数量
 			add(index) {
-				if (this.buylist[0].number >= 100) {
+				if (this.buylist[0].goods_number >= 100) {
 					return;
 				}
-				this.buylist[0].number++;
+				this.buylist[0].goods_number++;
+				this.sum()
+			},
+			sum() {
+				this.sumPrice = 0;
+				this.sumMarketPrice = 0;
+				this.sumIntegral = 0;
+				//合计
+				let len = this.buylist.length;
+				for (let i = 0; i < len; i++) {
+					this.sumPrice = this.sumPrice + (this.buylist[i].goods_number * this.buylist[i].price);
+					this.sumMarketPrice = this.sumMarketPrice + (this.buylist[i].goods_number * this.buylist[i].market_price);
+					this.sumIntegral = this.sumIntegral + (this.buylist[i].goods_number * this.buylist[i].integral_price);
+				}
 			},
 			clearOrder() {
 				uni.removeStorage({
@@ -274,12 +303,24 @@
 			toPay() {
 				//商品列表
 				let paymentOrder = [];
-				let carIdData = [];//用于最后删除购物车
+				let cartData = []; //用于最后删除购物车
 				let len = this.buylist.length;
-				for (let i = 0; i < len; i++) {
-					paymentOrder.push(this.buylist[i]);
-					carIdData.push(this.buylist[i].car_id);
+				let addOrderData = {
+					data: ''
 				}
+				let arrOrder = []
+				for (let i = 0; i < len; i++) {
+					let objOrder = {};
+					objOrder.goodsID = this.buylist[i].goods_id
+					objOrder.goodsNumber = this.buylist[i].goods_number
+					if (!this.rightNow) {
+						objOrder.carID = this.buylist[i].car_id
+					}
+					arrOrder.push(objOrder)
+					paymentOrder.push(this.buylist[i]);
+					cartData.push(this.buylist[i].car_id);
+				}
+				addOrderData.data = JSON.stringify(arrOrder)
 				if (paymentOrder.length == 0) {
 					uni.showToast({
 						title: '订单信息有误，请重新购买',
@@ -287,23 +328,47 @@
 					});
 					return;
 				}
-				//本地模拟订单提交UI效果
-				uni.showLoading({
-					title: '正在提交订单...'
-				})
-				uni.setStorageSync('car_id',carIdData)
-				setTimeout(() => {
-					uni.setStorage({
-						key: 'paymentOrder',
-						data: paymentOrder,
-						success: () => {
-							uni.hideLoading();
-							uni.redirectTo({
-								url: "../pay/payment/payment?amount=" + this.sumPrice
+				this.$Request.post(this.$Urlconf.cart.addOrder, addOrderData).then((res) => {
+					console.log(res);
+					console.log('立即购买到订单支付，金额传递失败');
+					if (res.code == 0) {
+						uni.redirectTo({
+							url: "../pay/payment/payment?sumPrice=" + this.sumPrice +
+								"&sumMarketPrice=" + this.sumMarketPrice +
+								"&sumIntegral=" + this.sumIntegral
+						})
+						//来自购物车是为false
+						if (!this.rightNow) {
+							uni.getStorage({
+								key: 'cartList',
+								success: (e) => {
+									let cartList = e.data
+									let len = cartData.length
+									if (cartList.length >= 1) {
+										for (var i = 0; i < len; i++) {
+											if (cartData.indexOf(cartList[i].goods_id) > -1) {
+												cartList.splice(i, 1);
+												i--;
+											}
+										}
+										uni.setStorage({
+											key: 'cartList',
+											data: cartList
+										})
+									}
+								},
+								fail: () => {}
 							})
+
 						}
-					})
-				}, 1000)
+						uni.setStorage({
+							key: 'paymentOrder',
+							data: paymentOrder,
+							success: () => {}
+						})
+
+					}
+				})
 
 			},
 		}

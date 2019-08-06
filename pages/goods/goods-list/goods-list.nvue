@@ -97,6 +97,9 @@
 			});
 		},
 		created() {
+			uni.showLoading({
+				mask:true
+			})
 			_self = this;
 			_self.goodsListQueryData = {
 				orderby: 'sales_volume',
@@ -104,7 +107,6 @@
 			};
 			//合并缓存中的搜索条件
 			Object.assign(_self.goodsListQueryData, uni.getStorageSync('queryData'))
-			console.log(_self.goodsListQueryData);
 			this.rootPath = ROOTPATH.APIHOST + ROOTPATH.IMGPATH
 			this.httpRequest(_self.goodsListQueryData)
 		},
@@ -127,7 +129,8 @@
 					data: data,
 					method: "GET",
 					header: {
-						"content-type": header
+						"content-type": header,
+						'token':uni.getStorageInfoSync('token')
 					},
 					success: function(result) {
 						if (result.data.code != 0) {
@@ -215,9 +218,6 @@
 			},
 			//商品跳转
 			toGoods(e) {
-				uni.showLoading({
-					mask: true
-				})
 				//存储商品默认展示图
 				uni.setStorageSync('imagePath', e.imagePath)
 				uni.navigateTo({

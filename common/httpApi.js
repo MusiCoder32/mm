@@ -7,6 +7,8 @@ module.exports = {
 		cartList: '/carList', //查询购物车数据
 		cartAdd: '/addCar', //加入购物车
 		cartUpdate: '/changeCar', //修改购物车
+		orderList:'/orderList',//查看订单
+		addOrder:'/addOrder',//提交订单
 	},
 	home: {
 		getAdList: '/getAdList', //首页轮播图

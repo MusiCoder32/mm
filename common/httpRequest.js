@@ -31,7 +31,6 @@ module.exports = {
 		let token = uni.getStorageSync('token')
 		header = header || "application/x-www-form-urlencoded";
 		url = this.config("APIHOST") + this.config("APIPATH") + url;
-		console.log(url)
 		return new Promise((succ, error) => {
 			uni.request({
 				url: url,
@@ -42,7 +41,7 @@ module.exports = {
 					'token': token || '',
 				},
 				success: function(result) {
-					console.log(result.data)
+					console.log(url+':'+result.data)
 					if (result.data.code != 0) {
 						uni.showToast({
 							title: result.data.msg,
@@ -72,7 +71,6 @@ module.exports = {
 		})
 		header = header || "application/x-www-form-urlencoded";
 		url = this.config("APIHOST") + this.config("APIPATH") + url;
-		console.log(url)
 		return new Promise((succ, error) => {
 			uni.request({
 				url: url,
@@ -88,7 +86,7 @@ module.exports = {
 							icon: 'none'
 						})
 					}
-					console.log(result.data);
+					console.log(url+':'+result.data)
 					succ.call(self, result.data)
 				},
 				fail: function(e) {

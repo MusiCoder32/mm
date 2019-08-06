@@ -471,10 +471,6 @@
 			},
 			//分类跳转
 			toCategory(e) {
-				//uni.showToast({title: e.name,icon:"none"});
-				uni.showLoading({
-					mask: true
-				})
 				uni.setStorageSync('catName', e.name);
 				uni.setStorageSync('queryData', {
 					parent: e.id
@@ -492,10 +488,6 @@
 			},
 			//商品跳转
 			toGoods(e) {
-				uni.showToast({
-					title: '商品' + e.goods_id,
-					icon: 'none'
-				});
 				uni.navigateTo({
 					url: '../../goods/goods'
 				});

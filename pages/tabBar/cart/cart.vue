@@ -150,18 +150,14 @@
 			}, 1000);
 		},
 		onShow() {
-			console.log(1);
 			uni.getStorage({
 				key: 'cartList',
 				success: (e) => {
 					this.goodsList = e.data;
 				},
 				fail: () => {
-					console.log(2);
-					this.goodsList = [];
 				}
 			})
-			console.log(this.goodsList)
 			//匹配购物车原有数据，若购物车中没有该商品，则增加到购物车数据中
 			uni.getStorage({
 				key: 'saveCart',

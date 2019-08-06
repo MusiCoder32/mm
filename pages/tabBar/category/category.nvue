@@ -129,13 +129,9 @@
 				});
 			},
 			toCategory(e) {
-				uni.showLoading({
-					mask: true
-				})
 				uni.setStorageSync('queryData', {
 					goodsTye: e.id
 				})
-				con
 				uni.setStorageSync('catName',e.type_name)
 				uni.navigateTo({
 					url: '../../goods/goods-list/goods-list?cid=' + e.id + '&name=' + e.type_name

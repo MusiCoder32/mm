@@ -256,12 +256,11 @@
 			this.$Request.get(this.$Urlconf.home.goodsText, {
 				id: option.goods_id
 			}).then((res) => {
+				console.log(res)
 				if (res.code == 0) {
 					this.swiperList = res.data.imageList;
 					this.goodsData = res.data;
 				}
-			}).finally(()=>{
-				uni.hideLoading() //关掉上一个页面打开的loading
 			})
 		},
 		onReady() {
@@ -321,7 +320,7 @@
 			},
 			// 加入购物车
 			joinCart() {
-				if(!this.goodsData.goods_id) {
+				if (!this.goodsData.goods_id) {
 					return;
 				}
 				console.log(uni.getStorageSync('saveCart'))
@@ -369,16 +368,20 @@
 			},
 			//跳转确认订单页面
 			toConfirmation() {
+				if (!this.goodsData.goods_id) {
+					return;
+				}
 				let tmpList = [];
 				let goods = this.goodsData;
 				goods.goods_number = 1;
+				goods.imagePath = uni.getStorageSync('imagePath');
 				tmpList.push(goods);
 				uni.setStorage({
 					key: 'buylist',
 					data: tmpList,
 					success: () => {
 						uni.navigateTo({
-							url: '../order/confirmation'
+							url: '../order/confirmation?rightNow=1'
 						})
 					}
 				})
