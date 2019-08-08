@@ -61,6 +61,9 @@
 		},
 		onLoad(options) {
 			_self = this;
+			if(options.code==1001){
+				this.logout(1001);
+			}
 			let user_text = uni.getStorageSync('user_text')
 			if (user_text) {
 				uni.switchTab({
@@ -100,17 +103,10 @@
 
 		},
 		onBackPress(options) {
-			this.onreturn();
 			return true;
 		},
 		methods: {
-			...mapMutations(['login','getGoodTypeAll','updateAuth']),
-			onreturn() {
-
-				uni.reLaunch({
-					url: '/pages/tabBar/home/home'
-				});
-			},
+			...mapMutations(['login','logout','getGoodTypeAll','updateAuth']),
 			oauthLogin(provider) {
 				uni.showLoading();
 				//第三方登录

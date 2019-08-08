@@ -39,22 +39,25 @@ const store = new Vuex.Store({
 				data: provider.user_wallet
 			})
 		},
-		logout(state) {
-
+		logout(state, code = 1001) {
 			uni.showLoading({
 				mask: true,
 			})
 			state.hasLogin = false;
 			state.userInfo = {};
+			state.authResult = {};
+			state.goodTypeAll = [];
 			try {
 				uni.clearStorageSync();
 			} catch (e) {
 				// error
 			}
 			uni.hideLoading()
-			uni.reLaunch({
-				url: '/pages/login/login'
-			})
+			if (code != 1001) {
+				uni.reLaunch({
+					url: '/pages/login/login'
+				})
+			}
 		},
 		updateAuth(state, value) {
 			state.authResult = value

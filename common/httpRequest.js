@@ -41,21 +41,11 @@ module.exports = {
 					'token': token || '',
 				},
 				success: function(result) {
-					if (result.code == 1001) {
-						console.log(1111)
-						uni.showLoading({
-							mask: true,
-						})
-						try {
-							uni.clearStorageSync();
-						} catch (e) {
-							// error
-						}
+					if (result.data.code == 1001) {
 						uni.hideLoading()
 						uni.reLaunch({
-							url: '/pages/login/login'
+							url: '/pages/login/login?code=1001'
 						})
-						return;
 					}
 					if (result.data.code != 0) {
 						uni.showToast({
@@ -97,18 +87,10 @@ module.exports = {
 					"content-type": header
 				},
 				success: function(result) {
-					if (result.code == 1001) {
-						uni.showLoading({
-							mask: true,
-						})
-						try {
-							uni.clearStorageSync();
-						} catch (e) {
-							// error
-						}
+					if (result.data.code == 1001) {
 						uni.hideLoading()
 						uni.reLaunch({
-							url: '/pages/login/login'
+							url: '/pages/login/login?code=1001'
 						})
 					}
 					if (result.data.code != 0) {
