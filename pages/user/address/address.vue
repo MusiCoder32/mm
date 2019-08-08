@@ -22,7 +22,7 @@
 					</view>
 					<view class="right">
 						<view class="icon bianji" @tap.stop="edit(row)">
-
+							编辑
 						</view>
 					</view>
 				</view>

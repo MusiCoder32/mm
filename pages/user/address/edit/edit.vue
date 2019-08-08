@@ -39,7 +39,7 @@
 					设置默认地址
 				</view>
 				<view class="input switch">
-					<switch color="#f06c7a" :checked="is_default" @change=isDefaultChange />
+					<switch color="#f06c7a" :checked="is_default" @change="isDefaultChange" />
 				</view>
 			</view>
 			<view class="row" v-if="editType=='edit'" @tap="del">

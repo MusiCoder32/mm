@@ -25,6 +25,12 @@
 						<view class="icon xiangyou"></view>
 					</view>
 				</view>
+				<view class="row" @click="editInfo('pws')">
+					<view class="title">修改支付密码</view>
+					<view class="right">
+						<view class="icon xiangyou"></view>
+					</view>
+				</view>
 			</view>
 		</view>
 		<view class="list-cell log-out-btn" @click="logout">
@@ -143,12 +149,21 @@
 				})
 			},
 			editInfo(item) {
-				uni.navigateTo({
-					url: '/pages/user/setting/setItem/edit_info?item=' + item,
-					success: res => {},
-					fail: () => {},
-					complete: () => {}
-				});
+				if (item == 'pws') {
+					uni.navigateTo({
+						url: '/pages/user/pws/pws?',
+						success: res => {},
+						fail: () => {},
+						complete: () => {}
+					});
+				} else {
+					uni.navigateTo({
+						url: '/pages/user/setting/setItem/edit_info?item=' + item,
+						success: res => {},
+						fail: () => {},
+						complete: () => {}
+					});
+				}
 			}
 		},
 		computed: {

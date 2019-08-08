@@ -1,11 +1,11 @@
 {
   "pages": [
+    "pages/login/login",
     "pages/tabBar/home/home",
     "pages/cardAuth/cardAuth",
     "pages/tabBar/cart/cart",
     "pages/tabBar/user/user",
     "pages/goods/goods",
-    "pages/login/login",
     "pages/login/register",
     "pages/login/resetpasswd",
     "pages/order/confirmation",
@@ -16,6 +16,10 @@
     "pages/msg/chat/chat",
     "pages/user/coupon/coupon",
     "pages/user/keep/keep",
+    "pages/user/pws/pws",
+    "pages/user/pws/repws",
+    "pages/user/card/card",
+    "pages/user/card/edit/edit",
     "pages/user/address/address",
     "pages/user/address/edit/edit",
     "pages/user/deposit/deposit",

@@ -9,7 +9,7 @@ const store = new Vuex.Store({
 	state: {
 		hasLogin: false,
 		userInfo: {},
-		authResult: uni.getStorageSync('authResult'), //authResult.state获取认证状态
+		authResult: uni.getStorageSync('authResult') || {}, //authResult.state获取认证状态
 		goodTypeAll: []
 	},
 	mutations: {

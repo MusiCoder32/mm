@@ -41,7 +41,22 @@ module.exports = {
 					'token': token || '',
 				},
 				success: function(result) {
-					console.log(url+':'+result.data)
+					if (result.code == 1001) {
+						console.log(1111)
+						uni.showLoading({
+							mask: true,
+						})
+						try {
+							uni.clearStorageSync();
+						} catch (e) {
+							// error
+						}
+						uni.hideLoading()
+						uni.reLaunch({
+							url: '/pages/login/login'
+						})
+						return;
+					}
 					if (result.data.code != 0) {
 						uni.showToast({
 							title: result.data.msg,
@@ -49,6 +64,8 @@ module.exports = {
 						})
 					}
 					succ.call(self, result.data)
+					result.data.msg = url
+					console.log(result.data)
 				},
 				fail: function(e) {
 					uni.hideLoading()
@@ -80,14 +97,29 @@ module.exports = {
 					"content-type": header
 				},
 				success: function(result) {
+					if (result.code == 1001) {
+						uni.showLoading({
+							mask: true,
+						})
+						try {
+							uni.clearStorageSync();
+						} catch (e) {
+							// error
+						}
+						uni.hideLoading()
+						uni.reLaunch({
+							url: '/pages/login/login'
+						})
+					}
 					if (result.data.code != 0) {
 						uni.showToast({
 							title: result.data.msg,
 							icon: 'none'
 						})
 					}
-					console.log(url+':'+result.data)
 					succ.call(self, result.data)
+					result.data.msg = url
+					console.log(result.data)
 				},
 				fail: function(e) {
 					uni.hideLoading()

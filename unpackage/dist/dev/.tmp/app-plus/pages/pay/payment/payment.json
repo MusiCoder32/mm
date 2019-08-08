@@ -3,5 +3,7 @@
   "navigationBarTitleText": "订单支付",
   "backgroundColorTop": "#ffffff",
   "backgroundColorBottom": "#ffffff",
-  "usingComponents": {}
+  "usingComponents": {
+    "digital-keyboard": "/components/digital-keyboard"
+  }
 }

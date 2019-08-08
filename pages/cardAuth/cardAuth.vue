@@ -4,7 +4,7 @@
 		<view v-if="authResult.state===1">您已认证</view>
 		<view v-if="authResult.state===2">失败原因:{{authResult.not_pass_reason}}\n如有疑问，请联系028-88888</view>
 
-		<view v-if="authResult.state == '' || authResult.state == undefined">
+		<view v-if="authResult.state !=0 && authResult.state != 1 && authResult.state != 2">
 			<view class="cu-form-group">
 				<view class="title"><text style="color: red;">*</text>姓名：</view>
 				<input focus="true" placeholder="请输入真实姓名" name="input" v-model="cardName"></input>
@@ -40,7 +40,7 @@
 </template>
 <script>
 	import {
-		mapState
+		mapState,mapMutations
 	}
 	from 'vuex'
 	var _self;
@@ -60,6 +60,7 @@
 			console.log(this.authResult.state)
 		},
 		methods: {
+			...mapMutations(['updateAuth']),
 			uploadImage(data, id) {
 				uni.uploadFile({
 					url: 'http://t249d62588.zicp.vip/api/uploadImage',
@@ -79,6 +80,7 @@
 								this.idCard1 = data.data;
 							} else if (id == 2) {
 								this.idCard2 = data.data;
+								uni.hideLoading()
 							}
 						}
 						console.log(res)
@@ -104,6 +106,11 @@
 					count: 1,
 					success: function(res) {
 						_self.pathCard2 = res.tempFilePaths[0];
+						uni.showLoading({
+							title:'资料上传中',
+							mask:true,
+							icon:'none'
+						})
 						_self.uploadImage(_self.pathCard2, 2)
 					}
 				})
@@ -154,7 +161,12 @@
 					imageB: this.idCard2
 				}
 				this.$Request.post(this.$Urlconf.cardAuth.addUserAuthentication, addUserAuthenticationData).then((res) => {
-					if (res.code != 0) {
+					console.log(res)
+					if (res.code == 0) {
+						let authResult = uni.getStorageSync('authResult') || {}
+						authResult.state = 0;
+						this.updateAuth(authResult)
+						uni.setStorageSync('authResult', authResult)
 						uni.navigateBack({
 							delta: 1
 						});

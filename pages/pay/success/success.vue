@@ -4,10 +4,10 @@
 			<image src="/static/img/success.png"></image>
 		</view>
 		<view class="tis">
-			订单支付成功
+			支付成功
 		</view>
 		<view class="pay-amount">
-			支付金额:{{amount}}元
+			订单:{{order_sn}}
 		</view>
 		<view class="back">
 			<view class="btn" @tap="toUser">个人中心</view>
@@ -19,17 +19,19 @@
 	export default {
 		data() {
 			return {
-				amount:0
+				order_sn:0
 			};
 		},
 		onLoad(e) {
-			this.amount = parseFloat(e.amount).toFixed(2);
+			this.order_sn = e.order_sn;
+			uni.setStorageSync('')
 		},
 		methods: {
 			toUser() {
-				uni.switchTab({
-					url: '/pages/tabBar/user'
-				});
+				uni.setStorageSync('tbIndex',1)
+				uni.navigateTo({
+					url: '/pages/user/order_list/order_list?tbIndex=1'
+				})
 			}
 		},
 	}

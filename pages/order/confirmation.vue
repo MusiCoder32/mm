@@ -85,7 +85,7 @@
 				<view class="nominal">
 					商品金额
 				</view>
-				<view v-if="type==1" class="content">￥{{sumPrice|toFixed}}</view>
+				<view v-if="type==1" class="content">￥{{sumMarketPrice|toFixed}}</view>
 				<view v-if="type==3" class="content">积分:{{sumIntegral|toFixed}}</view>
 				<view v-if="type==2" class="content" style="display: flex;justify-content: flex-e;flex-direction: row;">
 					<text class="product-info-price"> ￥{{sumMarketPrice|toFixed }}</text>
@@ -329,13 +329,13 @@
 					return;
 				}
 				this.$Request.post(this.$Urlconf.cart.addOrder, addOrderData).then((res) => {
-					console.log(res);
-					console.log('立即购买到订单支付，金额传递失败');
 					if (res.code == 0) {
 						uni.redirectTo({
-							url: "../pay/payment/payment?sumPrice=" + this.sumPrice +
-								"&sumMarketPrice=" + this.sumMarketPrice +
-								"&sumIntegral=" + this.sumIntegral
+							url: "../pay/payment/payment?price=" + this.sumPrice +
+								"&market_price=" + this.sumMarketPrice +
+								"&integral_price=" + this.sumIntegral +
+								"&goods_type=" + this.type +
+								"&order_sn=" + res.data 
 						})
 						//来自购物车是为false
 						if (!this.rightNow) {

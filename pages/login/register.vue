@@ -22,6 +22,9 @@
 			<view class="password">
 				<input placeholder="请确认密码" v-model="passwdConfirm" password=true placeholder-style="color: rgba(255,255,255,0.8);" />
 			</view>
+						<view class="password">
+				<input placeholder="推荐人手机号,可不填" v-model="recommendPhone" password=true placeholder-style="color: rgba(255,255,255,0.8);" />
+			</view>
 			<view class="btn" @tap="doReg">立即注册</view>
 			<view class="res">
 				<view @tap="toLogin">已有账号立即登录</view>
@@ -45,6 +48,7 @@
 				passwd: "",
 				passwdConfirm: "",
 				getCodeText: '获取验证码',
+				recommendPhone: '',
 				getCodeBtnColor: "#ffffff",
 				getCodeisWaiting: false,
 				nickname: ""
@@ -140,6 +144,16 @@
 					});
 					return false;
 				}
+								if (!this.recommendPhone.trim()) {
+					if (!(/^1(3|4|5|6|7|8|9)\d{9}$/.test(this.recommendPhone))) {
+						uni.showToast({
+							title: '推荐人手机号码错误',
+							icon: "none"
+						});
+				
+					}
+				
+				}
 				uni.showLoading({
 					title: '提交中...'
 				})
@@ -152,7 +166,8 @@
 					mobile: this.phoneNumber,
 					password: this.passwd,
 					repeat_password: this.passwdConfirm,
-					nickname: this.nickname
+					nickname: this.nickname,
+					recommendPhone: this.recommendPhone
 				}
 				this.$Request.post(this.$Urlconf.login.register, registerData).then(res => {
 					if (res.code == 0) {

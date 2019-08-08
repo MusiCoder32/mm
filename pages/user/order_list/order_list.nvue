@@ -17,7 +17,8 @@
 				<cell v-for="(row, rowIndex) in page" :key="rowIndex" v-if="page.length > 0">
 					<div class="row">
 						<text class="type">{{ typeText[row.state]}}</text>
-						<div class="order-info" @click="toOrderDetail(row)">
+						<!-- <div class="order-info" @click="toOrderDetail(row)"> -->
+						<div class="order-info">
 							<div class="order-info-left">
 								<image class="left-image" :src="rootPath+row.detailed[0].imagePath"></image>
 							</div>

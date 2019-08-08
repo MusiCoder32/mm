@@ -45,11 +45,11 @@
 			</view>
 		</view>
 		<!-- 广告图 -->
-		<view class="banner">
+		<view class="banner" @click="toGift">
 			<image src="/static/img/activing2.png"></image>
 		</view>
 		<!-- 活动区 -->
-		<view class="promotion">
+		<!-- 		<view class="promotion">
 			<view class="text">优惠专区</view>
 			<view class="list">
 				<view class="column" v-for="(row, index) in Promotion" @tap="toPromotion(row)" :key="index">
@@ -73,8 +73,9 @@
 				</view>
 			</view>
 		</view>
+		 -->
 		<!-- 商品列表 -->
-		<view class="goods-list">
+		<!-- 		<view class="goods-list">
 			<view class="title">
 				<image src="/static/img/hua.png"></image>
 				猜你喜欢
@@ -92,6 +93,7 @@
 			</view>
 			<view class="loading-text">{{ loadingText }}</view>
 		</view>
+	 -->
 	</view>
 </template>
 
@@ -315,26 +317,26 @@
 			this.showHeader = false;
 			this.statusHeight = plus.navigator.getStatusbarHeight();
 			// #endif
-			this.amapPlugin = new amap.AMapWX({
-				//高德地图KEY，随时失效，请务必替换为自己的KEY，参考：http://ask.dcloud.net.cn/article/35070
-				key: '7c235a9ac4e25e482614c6b8eac6fd8e'
-			});
-			//定位地址
-			this.amapPlugin.getRegeo({
-				success: data => {
-					this.city = data[0].regeocodeData.addressComponent.city.replace(/市/g, ''); //把"市"去掉
-					// #ifdef APP-PLUS
-					this.nVueTitle.postMessage({
-						type: 'location',
-						city: this.city
-					});
-					// #endif
-				}
-			});
-			//开启定时器
-			this.Timer();
+			// this.amapPlugin = new amap.AMapWX({
+			// 	//高德地图KEY，随时失效，请务必替换为自己的KEY，参考：http://ask.dcloud.net.cn/article/35070
+			// 	key: '7c235a9ac4e25e482614c6b8eac6fd8e'
+			// });
+			// //定位地址
+			// this.amapPlugin.getRegeo({
+			// 	success: data => {
+			// 		this.city = data[0].regeocodeData.addressComponent.city.replace(/市/g, ''); //把"市"去掉
+			// 		// #ifdef APP-PLUS
+			// 		this.nVueTitle.postMessage({
+			// 			type: 'location',
+			// 			city: this.city
+			// 		});
+			// 		// #endif
+			// 	}
+			// });
+			// //开启定时器
+			// this.Timer();
 			//加载活动专区
-			this.loadPromotion();
+			// this.loadPromotion();
 			// 提前下载购物车数据
 			this.$Request.post(this.$Urlconf.cart.cartList).then((res) => {
 				if (res.code == 0) {
@@ -354,8 +356,24 @@
 				}
 			})
 
+			//提前查询用户收货地址，存存入storage
+			this.$Request.post(this.$Urlconf.user.getUserAddress).then((res) => {
+				console.log(res)
+				if (res.code == 0) {
+					uni.setStorage({
+						key: 'addressList',
+						data: res.data
+					})
+				}
+			})
+			
 		},
 		methods: {
+			toGift() {
+				uni.navigateTo({
+					url: '/pages/goods/goods?goods_id=34'
+				})
+			},
 			...mapMutations(['login', 'logout']),
 			//加载Promotion 并设定倒计时,,实际应用中应该是ajax加载此数据。
 			loadPromotion() {

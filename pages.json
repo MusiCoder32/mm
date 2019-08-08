@@ -1,6 +1,17 @@
 {
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录",
+				"navigationBarBackgroundColor": "#f06c7a",
+				"navigationBarTextStyle": "white",
+				"app-plus": {
+					"bounce": "none", //关闭窗口回弹效果
+					"softinputNavBar": "none"
+				}
+			}
+		}, {
 			"path": "pages/tabBar/home/home",
 			"style": {
 				"navigationBarTextStyle": "black",
@@ -105,18 +116,6 @@
 			}
 		},
 		{
-			"path": "pages/login/login",
-			"style": {
-				"navigationBarTitleText": "登录",
-				"navigationBarBackgroundColor": "#f06c7a",
-				"navigationBarTextStyle": "white",
-				"app-plus": {
-					"bounce": "none", //关闭窗口回弹效果
-					"softinputNavBar": "none"
-				}
-			}
-		},
-		{
 			"path": "pages/login/register",
 			"style": {
 				"navigationBarTitleText": "注册账号",
@@ -217,6 +216,41 @@
 				}
 			}
 		}, {
+			"path": "pages/user/pws/pws",
+			"style": {
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "支付密码设置",
+				"backgroundColorTop": "#ffffff",
+				"backgroundColorBottom": "#ffffff"
+			}
+		},
+		{
+			"path": "pages/user/pws/repws",
+			"style": {
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "重置支付密码",
+				"backgroundColorTop": "#ffffff",
+				"backgroundColorBottom": "#ffffff"
+			}
+		},
+		{
+			"path": "pages/user/card/card",
+			"style": {
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "现金帐户管理",
+				"backgroundColorTop": "#ffffff",
+				"backgroundColorBottom": "#ffffff"
+			}
+		}, {
+			"path": "pages/user/card/edit/edit",
+			"style": {
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "添加帐户",
+				"backgroundColorTop": "#ffffff",
+				"backgroundColorBottom": "#ffffff"
+			}
+		},
+		{
 			"path": "pages/user/address/address",
 			"style": {
 				"navigationBarBackgroundColor": "#ffffff",

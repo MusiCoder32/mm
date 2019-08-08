@@ -22,10 +22,10 @@
 			<!-- 昵称,个性签名 -->
 			<view class="right">
 				<view class="username">{{user_text.nickname}}</view>
-				<view class="signature" @tap="toSetting" style="margin-top: 20upx;">
-					<navigator style="color: lightsteelblue;" hover-class="navigator-hover" open-type='navigate' url="/pages/cardAuth/cardAuth">
+				<view class="signature" @click="toAuth" style="margin-top: 20upx;">
+					<view style="color: lightsteelblue;">
 						{{authResult.state|authTitle}}
-					</navigator>
+					</view>
 				</view>
 			</view>
 			<!-- 二维码按钮 -->
@@ -80,7 +80,7 @@
 			<!-- 提现 -->
 			<view v-if="security" class="balance-info" style="border-top: solid 1upx #17e6a1;padding-top: 10upx;">
 				<view class="left">
-					<view  class="box">
+					<view class="box">
 						<view class="num">{{user_wallet.account_achievement}}</view>
 						<view class="text">业绩</view>
 					</view>
@@ -124,7 +124,7 @@
 	export default {
 		data() {
 			return {
-				security:false,
+				security: false,
 				head_portrait: '',
 				currentRoute: '',
 				isfirst: true,
@@ -172,47 +172,48 @@
 					}
 				],
 				// 工具栏列表
-				mytoolbarList: [{
-						url: '../../user/keep/keep',
-						text: '我的收藏',
-						img: '/static/img/user/point.png'
-					},
-					{
-						url: '../../user/coupon/coupon',
-						text: '优惠券',
-						img: '/static/img/user/quan.png'
-					},
-					{
-						url: '',
-						text: '新客豪礼',
-						img: '/static/img/user/renw.png'
-					},
-					{
-						url: '',
-						text: '领红包',
-						img: '/static/img/user/momey.png'
-					},
+				mytoolbarList: [
+					//{
+					// 		url: '../../user/keep/keep',
+					// 		text: '我的收藏',
+					// 		img: '/static/img/user/point.png'
+					// 	},
+					// 	{
+					// 		url: '../../user/coupon/coupon',
+					// 		text: '优惠券',
+					// 		img: '/static/img/user/quan.png'
+					// 	},
+					// 	{
+					// 		url: '',
+					// 		text: '新客豪礼',
+					// 		img: '/static/img/user/renw.png'
+					// 	},
+					// 	{
+					// 		url: '',
+					// 		text: '领红包',
+					// 		img: '/static/img/user/momey.png'
+					// 	},
 
 					{
 						url: '../../user/address/address',
 						text: '收货地址',
 						img: '/static/img/user/addr.png'
 					},
+					// {
+					// 	url: '',
+					// 	text: '账户安全',
+					// 	img: '/static/img/user/security.png'
+					// },
 					{
-						url: '',
-						text: '账户安全',
-						img: '/static/img/user/security.png'
-					},
-					{
-						url: '',
+						url: '/pages/user/card/card',
 						text: '银行卡',
 						img: '/static/img/user/bank.png'
 					},
-					{
-						url: '',
-						text: '抽奖',
-						img: '/static/img/user/choujiang.png'
-					},
+					// {
+					// 	url: '',
+					// 	text: '抽奖',
+					// 	img: '/static/img/user/choujiang.png'
+					// },
 					// {text:'客服',img:'/static/img/user/kefu.png'},
 					// {text:'签到',img:'/static/img/user/mingxi.png'}
 
@@ -261,7 +262,6 @@
 							uni.getSavedFileInfo({
 								filePath: localPortrait, //仅做示例用，非真正的文件路径
 								success: function(res) {
-									console.log(res);
 									//本地图片信息获取成功，使用本地图片展示头像
 									_self.head_portrait = localPortrait;
 								},
@@ -288,14 +288,18 @@
 			});
 			//在登陆时已将认证状态存入全局。只有状态为认证中每次进入时，查询认证状态。
 			if (this.authResult.state === 0) {
-				this.$Request.post(this.$Urlconf.cardAuth.getUserAuthentication).then((res) => {
-					if (res.code == 0) {
-						uni.setStorage({
-							key: 'authResult',
-							data: res.data
-						})
-						//此处不知为何，this为undifined
-						_self.updateAuth(res.data)
+				let rootPath = this.$RootHttp.APIHOST + this.$RootHttp.APIPATH
+				uni.request({
+					url: rootPath + this.$Urlconf.cardAuth.getUserAuthentication,
+					success: (res) => {
+						if (res.code == 0) {
+							uni.setStorage({
+								key: 'authResult',
+								data: res.data
+							})
+							//此处不知为何，this为undifined
+							_self.updateAuth(res.data)
+						}
 					}
 				})
 			}
@@ -303,6 +307,14 @@
 		methods: {
 			...mapMutations(['hasLogined', 'updateAuth']),
 			//重新请求用户关头像
+			toAuth() {
+				console.log(this.authResult.state);
+				if (!this.authResult.state || this.authResult.state == 2) {
+					uni.navigateTo({
+						url: "/pages/cardAuth/cardAuth"
+					})
+				}
+			},
 			getUserPortrait(imgPath) {
 				uni.showLoading()
 				let user_text = uni.getStorageSync('user_text')
@@ -399,12 +411,13 @@
 		},
 		filters: {
 			authTitle: function(type) {
+				console.log(type)
 				if (type === 0) {
 					return '认证中>'
 				} else if (type === 1) {
 					return '已认证'
 				} else if (type === 2) {
-					return '认证失败>'
+					return '认证失败,重新认证>'
 				} else {
 					return '未认证>'
 				}
